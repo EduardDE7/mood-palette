@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${ubuntu.variable} min-h-screen bg-background font-sans text-foreground antialiased`}
+        className={`${ubuntu.variable} bg-background text-foreground min-h-screen font-sans antialiased`}
       >
         {children}
       </body>

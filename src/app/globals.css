@@ -1,16 +1,42 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
 
   --font-sans: var(--font-ubuntu);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
 :root {
-  --background: #dadada;
-  --foreground: #2d2d2d;
-  --accent: rgb(79, 70, 229);
-  --ease-elastic-1: cubic-bezier(0.2, 0, 0.39, 1);
+  --background: 280 6% 10%;
+  --foreground: 0 0% 100%;
+
+  --primary: 260 90% 70%;
+  --primary-foreground: 0 0% 100%;
+
+  --muted: 280 6% 20%;
+  --muted-foreground: 280 5% 65%;
+
+  --accent: 280 6% 25%;
+  --accent-foreground: 0 0% 100%;
+
+  --input: 280 6% 30%;
+  --ring: 260 90% 70%;
+
+  --radius: 0.75rem;
 }
