@@ -11,7 +11,20 @@ export default function Home() {
   const { colors, generatePalette } = usePaletteStore();
 
   useEffect(() => {
+    if (colors.length === 0) {
+      generatePalette();
+    }
+  }, [colors.length, generatePalette]);
+
+  useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLElement &&
+        (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON")
+      ) {
+        return;
+      }
+
       if (e.code === "Space") {
         e.preventDefault();
         generatePalette();

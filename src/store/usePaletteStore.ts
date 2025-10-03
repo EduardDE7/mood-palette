@@ -12,21 +12,32 @@ interface PaletteState {
   generatePalette: () => void;
   toggleLock: (id: string) => void;
   updateColor: (id: string, hex: string) => void;
+  removeColor: (id: string) => void;
+  addColor: () => void;
 }
 
-export const usePaletteStore = create<PaletteState>((set) => ({
-  colors: Array.from({ length: 5 }).map(() => ({
-    id: crypto.randomUUID(),
-    hex: generateRandomHex(),
-    isLocked: false,
-  })),
+export const usePaletteStore = create<PaletteState>((set, get) => ({
+  colors: [],
 
-  generatePalette: () =>
+  generatePalette: () => {
+    const { colors } = get();
+    if (colors.length === 0) {
+      set({
+        colors: Array.from({ length: 5 }).map(() => ({
+          id: crypto.randomUUID(),
+          hex: generateRandomHex(),
+          isLocked: false,
+        })),
+      });
+      return;
+    }
+
     set((state) => ({
       colors: state.colors.map((color) =>
         color.isLocked ? color : { ...color, hex: generateRandomHex() }
       ),
-    })),
+    }));
+  },
 
   toggleLock: (id: string) =>
     set((state) => ({
@@ -41,4 +52,27 @@ export const usePaletteStore = create<PaletteState>((set) => ({
         color.id === id ? { ...color, hex: hex.toUpperCase() } : color
       ),
     })),
+
+  removeColor: (id: string) =>
+    set((state) => ({
+      colors:
+        state.colors.length > 2
+          ? state.colors.filter((c) => c.id !== id)
+          : state.colors,
+    })),
+
+  addColor: () =>
+    set((state) => {
+      if (state.colors.length >= 8) return state;
+      return {
+        colors: [
+          ...state.colors,
+          {
+            id: crypto.randomUUID(),
+            hex: generateRandomHex(),
+            isLocked: false,
+          },
+        ],
+      };
+    }),
 }));
