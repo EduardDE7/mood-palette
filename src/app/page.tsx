@@ -8,13 +8,11 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
 export default function Home() {
-  const { colors, generatePalette } = usePaletteStore();
+  const { colors, generatePalette, syncWithUrl } = usePaletteStore();
 
   useEffect(() => {
-    if (colors.length === 0) {
-      generatePalette();
-    }
-  }, [colors.length, generatePalette]);
+    syncWithUrl();
+  }, [syncWithUrl]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
