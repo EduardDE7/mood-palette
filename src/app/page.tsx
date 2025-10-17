@@ -1,14 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePaletteStore } from "@/store/usePaletteStore";
 import { Header } from "@/components/Header";
 import { ColorColumn } from "@/components/ColorColumn";
+import { FavoritesSidebar } from "@/components/FavoritesSidebar";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
+const STAGGER_TRANSITION = {
+  staggerChildren: 0.05,
+  delayChildren: 0.1,
+};
+
 export default function Home() {
   const { colors, generatePalette, syncWithUrl } = usePaletteStore();
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
   useEffect(() => {
     syncWithUrl();
@@ -35,23 +43,56 @@ export default function Home() {
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
-      <Header />
-      <main className="flex flex-1 overflow-hidden">
-        {colors.map((color) => (
-          <ColorColumn key={color.id} {...color} />
-        ))}
-      </main>
+      <Header onOpenFavorites={() => setIsFavoritesOpen(true)} />
 
-      <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2">
-        <Button
-          size="lg"
-          onClick={generatePalette}
-          className="gap-2 rounded-full px-8 py-6 text-lg font-bold shadow-xl transition-transform hover:scale-105"
+      <motion.main
+        initial="initial"
+        animate="animate"
+        variants={{
+          animate: {
+            transition: STAGGER_TRANSITION,
+          },
+        }}
+        className="flex flex-1 overflow-hidden"
+      >
+        <AnimatePresence mode="popLayout" initial={false}>
+          {colors.map((color) => (
+            <ColorColumn key={color.id} {...color} />
+          ))}
+        </AnimatePresence>
+      </motion.main>
+
+      <div className="absolute bottom-12 left-1/2 z-30 -translate-x-1/2">
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          <RefreshCw size={20} />
-          Generate
-        </Button>
+          <Button
+            variant="premium"
+            size="xl"
+            round
+            onClick={generatePalette}
+            className="group"
+          >
+            <motion.div
+              animate={{ rotate: [0, 180] }}
+              transition={{ duration: 0.4, ease: "anticipate" }}
+              key={colors.map((c) => c.hex).join("-")}
+            >
+              <RefreshCw size={24} strokeWidth={3} />
+            </motion.div>
+            Generate
+          </Button>
+        </motion.div>
       </div>
+
+      <FavoritesSidebar
+        isOpen={isFavoritesOpen}
+        onClose={() => setIsFavoritesOpen(false)}
+      />
+
+      <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_150px_rgba(0,0,0,0.05)]" />
     </div>
   );
 }

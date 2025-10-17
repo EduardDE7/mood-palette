@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Unlock, Trash2, Copy } from "lucide-react";
+import { Lock, Unlock, Trash2, Copy, Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import { getContrastColor } from "@/utils/colors";
 import { usePaletteStore } from "@/store/usePaletteStore";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,30 @@ interface ColorColumnProps {
 }
 
 export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
-  const { toggleLock, removeColor, updateColor, colors } = usePaletteStore();
+  const {
+    toggleLock,
+    removeColor,
+    updateColor,
+    colors,
+    favorites,
+    addFavorite,
+    removeFavorite,
+  } = usePaletteStore();
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(hex);
   const contrastColor = getContrastColor(hex);
 
+  const isFavorite = favorites.includes(hex.toUpperCase());
   const canDelete = colors.length > 2;
+
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      removeFavorite(hex);
+    } else {
+      addFavorite(hex);
+    }
+  };
 
   const copyToClipboard = async () => {
     if (isEditing) return;
@@ -57,8 +75,12 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
   };
 
   return (
-    <div
-      className="group relative flex flex-1 flex-col items-center justify-center transition-all duration-300 ease-in-out"
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+      className="group relative flex flex-1 flex-col items-center justify-center"
       style={{ backgroundColor: hex, color: contrastColor }}
     >
       <div
@@ -74,10 +96,10 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
       <div className="z-10 flex flex-col items-center gap-4">
         <div className="flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
           <Button
-            variant="ghost"
+            variant="action"
             size="icon"
+            round
             onClick={() => toggleLock(id)}
-            className="rounded-full transition-transform hover:scale-110 hover:bg-black/10"
             style={{ color: contrastColor }}
             title={isLocked ? "Unlock" : "Lock"}
           >
@@ -85,10 +107,25 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
           </Button>
 
           <Button
-            variant="ghost"
+            variant="action"
             size="icon"
+            round
+            onClick={toggleFavorite}
+            style={{ color: contrastColor }}
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Heart
+              size={22}
+              className="drop-shadow-sm"
+              fill={isFavorite ? contrastColor : "none"}
+            />
+          </Button>
+
+          <Button
+            variant="action"
+            size="icon"
+            round
             onClick={copyToClipboard}
-            className="rounded-full transition-transform hover:scale-110 hover:bg-black/10"
             style={{ color: contrastColor }}
             title="Copy HEX"
           >
@@ -97,10 +134,10 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
 
           {canDelete && (
             <Button
-              variant="ghost"
+              variant="danger"
               size="icon"
+              round
               onClick={() => removeColor(id)}
-              className="rounded-full text-red-500 transition-transform hover:scale-110 hover:bg-red-500/20"
               title="Remove color"
             >
               <Trash2 size={20} />
@@ -122,7 +159,8 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
             style={{ color: contrastColor }}
           />
         ) : (
-          <h2
+          <motion.h2
+            layout="position"
             className="cursor-pointer text-2xl font-bold tracking-wider uppercase transition-transform select-none hover:scale-110 active:scale-95"
             onClick={startEditing}
             onContextMenu={(e) => {
@@ -132,9 +170,9 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
             title="Click to edit, Right-click to copy"
           >
             {hex.replace("#", "")}
-          </h2>
+          </motion.h2>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -1,8 +1,12 @@
-import { Palette, Plus } from "lucide-react";
+import { Palette, Plus, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
-export const Header = () => {
+interface HeaderProps {
+  onOpenFavorites: () => void;
+}
+
+export const Header = ({ onOpenFavorites }: HeaderProps) => {
   const addColor = usePaletteStore((state) => state.addColor);
 
   return (
@@ -22,15 +26,18 @@ export const Header = () => {
           </kbd>{" "}
           to generate!
         </p>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={addColor}
-          className="gap-2"
-        >
-          <Plus size={16} />
-          Add Color
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" round onClick={onOpenFavorites}>
+            <Heart size={18} />
+            Favorites
+          </Button>
+
+          <Button variant="outline" size="sm" round onClick={addColor}>
+            <Plus size={16} />
+            Add Color
+          </Button>
+        </div>
       </div>
     </header>
   );
