@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePaletteStore } from "@/store/usePaletteStore";
-import { Header } from "@/components/Header";
-import { ColorColumn } from "@/components/ColorColumn";
-import { FavoritesSidebar } from "@/components/FavoritesSidebar";
-import { Button } from "@/components/ui/button";
+import { Header, ColorColumn, FavoritesSidebar, Button } from "@/components";
 import { RefreshCw } from "lucide-react";
 
 const STAGGER_TRANSITION = {

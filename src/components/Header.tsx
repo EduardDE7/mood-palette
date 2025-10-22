@@ -1,5 +1,5 @@
 import { Palette, Plus, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
 interface HeaderProps {
@@ -10,10 +10,10 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
   const addColor = usePaletteStore((state) => state.addColor);
 
   return (
-    <header className="flex h-16 items-center justify-between bg-black px-6">
+    <header className="bg-background flex h-16 items-center justify-between px-6">
       <div className="flex items-center gap-2">
         <div className="bg-muted rounded-lg p-1.5">
-          <Palette className="text-primary-foreground" size={20} />
+          <Palette className="text-foreground" size={20} />
         </div>
         <h1 className="text-xl font-bold tracking-tight">MoodPalette</h1>
       </div>

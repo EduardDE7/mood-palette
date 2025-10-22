@@ -5,7 +5,7 @@ import { Lock, Unlock, Trash2, Copy, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { getContrastColor } from "@/utils/colors";
 import { usePaletteStore } from "@/store/usePaletteStore";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components";
 
 interface ColorColumnProps {
   id: string;

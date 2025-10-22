@@ -3,7 +3,7 @@
 import { X, Trash2, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePaletteStore } from "@/store/usePaletteStore";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components";
 
 interface FavoritesSidebarProps {
   isOpen: boolean;
