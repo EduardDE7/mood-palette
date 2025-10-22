@@ -14,22 +14,21 @@ interface ColorColumnProps {
 }
 
 export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
-  const {
-    toggleLock,
-    removeColor,
-    updateColor,
-    colors,
-    favorites,
-    addFavorite,
-    removeFavorite,
-  } = usePaletteStore();
+  const toggleLock = usePaletteStore((s) => s.toggleLock);
+  const removeColor = usePaletteStore((s) => s.removeColor);
+  const updateColor = usePaletteStore((s) => s.updateColor);
+  const colorsCount = usePaletteStore((s) => s.colors.length);
+  const favorites = usePaletteStore((s) => s.favorites);
+  const addFavorite = usePaletteStore((s) => s.addFavorite);
+  const removeFavorite = usePaletteStore((s) => s.removeFavorite);
+
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(hex);
   const contrastColor = getContrastColor(hex);
 
   const isFavorite = favorites.includes(hex.toUpperCase());
-  const canDelete = colors.length > 2;
+  const canDelete = colorsCount > 2;
 
   const toggleFavorite = () => {
     if (isFavorite) {

@@ -59,6 +59,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className
         )}
         ref={ref}
+        aria-label={props["aria-label"] || props.title}
         {...props}
       />
     );

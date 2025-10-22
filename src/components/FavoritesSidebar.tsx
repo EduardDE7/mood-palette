@@ -14,7 +14,8 @@ export const FavoritesSidebar = ({
   isOpen,
   onClose,
 }: FavoritesSidebarProps) => {
-  const { favorites, removeFavorite } = usePaletteStore();
+  const favorites = usePaletteStore((s) => s.favorites);
+  const removeFavorite = usePaletteStore((s) => s.removeFavorite);
 
   const copyToClipboard = async (hex: string) => {
     try {
@@ -46,7 +47,13 @@ export const FavoritesSidebar = ({
             <div className="flex h-full flex-col">
               <div className="flex items-center justify-between border-b p-6 dark:border-zinc-800">
                 <h2 className="text-xl font-bold">Favorites</h2>
-                <Button variant="ghost" size="icon" round onClick={onClose}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  round
+                  onClick={onClose}
+                  aria-label="Close sidebar"
+                >
                   <X size={20} />
                 </Button>
               </div>

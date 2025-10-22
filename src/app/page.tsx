@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { RefreshCw } from "lucide-react";
+
 import { usePaletteStore } from "@/store/usePaletteStore";
 import { Header, ColorColumn, FavoritesSidebar, Button } from "@/components";
-import { RefreshCw } from "lucide-react";
+import { useKeyboardShortcuts } from "@/hooks";
 
 const STAGGER_TRANSITION = {
   staggerChildren: 0.05,
@@ -12,31 +14,17 @@ const STAGGER_TRANSITION = {
 };
 
 export default function Home() {
-  const { colors, generatePalette, syncWithUrl } = usePaletteStore();
+  const colors = usePaletteStore((s) => s.colors);
+  const generatePalette = usePaletteStore((s) => s.generatePalette);
+  const syncWithUrl = usePaletteStore((s) => s.syncWithUrl);
+
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+
+  useKeyboardShortcuts();
 
   useEffect(() => {
     syncWithUrl();
   }, [syncWithUrl]);
-
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (
-        e.target instanceof HTMLElement &&
-        (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON")
-      ) {
-        return;
-      }
-
-      if (e.code === "Space") {
-        e.preventDefault();
-        generatePalette();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [generatePalette]);
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
@@ -70,7 +58,7 @@ export default function Home() {
             size="xl"
             round
             onClick={generatePalette}
-            className="group"
+            title="Generate new palette (Space)"
           >
             <motion.div
               animate={{ rotate: [0, 180] }}
