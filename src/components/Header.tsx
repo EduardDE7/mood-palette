@@ -1,5 +1,6 @@
-import { Palette, Plus, Heart } from "lucide-react";
-import { Button } from "@/components";
+import { useState } from "react";
+import { Palette, Plus, Heart, Download } from "lucide-react";
+import { Button, ExportModal } from "@/components";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
 interface HeaderProps {
@@ -8,6 +9,9 @@ interface HeaderProps {
 
 export const Header = ({ onOpenFavorites }: HeaderProps) => {
   const addColor = usePaletteStore((state) => state.addColor);
+  const colors = usePaletteStore((state) => state.colors);
+
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   return (
     <header className="bg-background flex h-16 items-center justify-between px-6">
@@ -28,6 +32,16 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
         </p>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            round
+            onClick={() => setIsExportOpen(true)}
+          >
+            <Download size={18} />
+            Export
+          </Button>
+
           <Button variant="ghost" size="sm" round onClick={onOpenFavorites}>
             <Heart size={18} />
             Favorites
@@ -39,6 +53,13 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
           </Button>
         </div>
       </div>
+
+      <ExportModal
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+        title="Export Palette"
+        colors={colors.map((c) => c.hex)}
+      />
     </header>
   );
 };
