@@ -83,35 +83,41 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
       style={{ backgroundColor: hex, color: contrastColor }}
     >
       <div
-        className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`glass-card pointer-events-none absolute inset-0 z-20 flex items-center justify-center border-none transition-opacity duration-300 ${
           copied ? "opacity-100" : "opacity-0"
         }`}
       >
-        <span className="text-xl font-bold tracking-widest text-white uppercase shadow-black drop-shadow-md">
+        <span className="text-foreground text-xl font-bold tracking-widest uppercase shadow-black drop-shadow-md">
           Copied!
         </span>
       </div>
 
-      <div className="z-10 flex flex-col items-center gap-4">
-        <div className="flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="z-10 flex flex-col items-center gap-6">
+        <div className="flex flex-col gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <Button
-            variant="action"
+            variant="ghost"
             size="icon"
-            round
             onClick={() => toggleLock(id)}
             style={{ color: contrastColor }}
             title={isLocked ? "Unlock" : "Lock"}
+            aria-label={isLocked ? "Unlock color" : "Lock color"}
+            className="h-9 w-9 bg-transparent shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:shadow-none"
           >
             {isLocked ? <Lock size={20} /> : <Unlock size={20} />}
           </Button>
 
           <Button
-            variant="action"
+            variant="ghost"
             size="icon"
-            round
             onClick={toggleFavorite}
             style={{ color: contrastColor }}
             title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            aria-label={
+              isFavorite
+                ? "Remove color from favorites"
+                : "Add color to favorites"
+            }
+            className="h-9 w-9 bg-transparent shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:shadow-none"
           >
             <Heart
               size={22}
@@ -121,23 +127,25 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
           </Button>
 
           <Button
-            variant="action"
+            variant="ghost"
             size="icon"
-            round
             onClick={copyToClipboard}
             style={{ color: contrastColor }}
             title="Copy HEX"
+            aria-label="Copy color HEX value"
+            className="h-9 w-9 bg-transparent shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:shadow-none"
           >
             <Copy size={20} />
           </Button>
 
           {canDelete && (
             <Button
-              variant="danger"
+              variant="ghost"
               size="icon"
-              round
               onClick={() => removeColor(id)}
               title="Remove color"
+              aria-label="Remove color"
+              className="h-9 w-9 bg-transparent text-red-500 shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:text-red-400 hover:shadow-none"
             >
               <Trash2 size={20} />
             </Button>
@@ -160,7 +168,7 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
         ) : (
           <motion.h2
             layout="position"
-            className="cursor-pointer text-2xl font-bold tracking-wider uppercase transition-transform select-none hover:scale-110 active:scale-95"
+            className="cursor-pointer text-2xl font-bold tracking-wider uppercase transition-transform select-none hover:scale-110"
             onClick={startEditing}
             onContextMenu={(e) => {
               e.preventDefault();

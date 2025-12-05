@@ -15,6 +15,11 @@
 
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+  --color-border: hsl(var(--border));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
 
   --font-sans: var(--font-ubuntu);
   --radius-lg: var(--radius);
@@ -23,20 +28,56 @@
 }
 
 :root {
-  --background: 280 6% 10%;
+  --background: 280 6% 7%;
   --foreground: 0 0% 100%;
+
+  --card: 280 6% 10%;
+  --card-foreground: 0 0% 100%;
+
+  --popover: 280 6% 10%;
+  --popover-foreground: 0 0% 100%;
 
   --primary: 260 90% 70%;
   --primary-foreground: 0 0% 100%;
 
-  --muted: 280 6% 20%;
+  --muted: 280 6% 15%;
   --muted-foreground: 280 5% 65%;
 
-  --accent: 280 6% 25%;
+  --accent: 280 6% 20%;
   --accent-foreground: 0 0% 100%;
 
-  --input: 280 6% 30%;
+  --border: 0 0% 100% / 0.1;
+  --input: 280 6% 25%;
   --ring: 260 90% 70%;
 
   --radius: 0.75rem;
+}
+
+@utility glass-card {
+  background-color: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(24px);
+  border: 1px solid hsl(var(--border) / 1);
+}
+
+@utility glass-pill {
+  background-color: hsl(var(--muted) / 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 1);
+}
+
+body {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(
+      ellipse at top left,
+      hsla(260, 90%, 70%, 0.08) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      hsla(210, 90%, 70%, 0.06) 0%,
+      transparent 55%
+    );
+  background-attachment: fixed;
+  min-height: 100vh;
 }

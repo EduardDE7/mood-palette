@@ -27,18 +27,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const variants = {
-      default: "bg-primary text-primary-foreground hover:opacity-90 shadow-sm",
+      default: "glass-pill hover:bg-muted/60 shadow-sm transition-all",
       outline:
-        "border border-input bg-transparent hover:bg-zinc-100 hover:text-accent-foreground dark:hover:bg-zinc-800",
+        "glass-pill bg-background/40 hover:bg-accent/40 shadow-sm transition-all",
       ghost:
-        "hover:bg-zinc-100 hover:text-accent-foreground dark:hover:bg-zinc-800 bg-transparent",
-      link: "text-primary underline-offset-4 hover:underline",
+        "hover:bg-accent/40 hover:shadow-sm text-foreground bg-transparent transition-all",
+      link: "text-foreground underline-offset-4 hover:underline",
       action:
-        "hover:bg-black/10 hover:scale-110 active:scale-95 transition-all bg-transparent",
+        "glass-pill bg-transparent border-transparent hover:scale-110 transition-all text-foreground shadow-none backdrop-blur-none",
       danger:
-        "text-red-500 hover:bg-red-500/10 hover:scale-110 active:scale-95 transition-all bg-transparent",
+        "text-red-400 hover:bg-red-400/10 backdrop-blur-md hover:scale-110 transition-all bg-transparent",
       premium:
-        "bg-primary text-primary-foreground shadow-2xl hover:opacity-90 hover:shadow-primary/20",
+        "glass-card bg-primary/10 border-primary/20 text-foreground shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:bg-primary/20 hover:shadow-[0_8px_32px_rgba(255,255,255,0.02)] transition-all overflow-hidden relative",
     };
 
     const sizes = {
@@ -52,7 +52,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
-          "focus-visible:ring-ring inline-flex items-center justify-center gap-2 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95 disabled:pointer-events-none disabled:opacity-50",
+          "focus-visible:ring-ring inline-flex items-center justify-center gap-2 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
           round ? "rounded-full" : "rounded-md",
           variants[variant],
           sizes[size],

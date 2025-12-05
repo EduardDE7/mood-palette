@@ -45,11 +45,13 @@ export const FavoritesSidebar = ({
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 z-50 h-full w-80 bg-white shadow-2xl dark:bg-zinc-900"
+              className="glass-card fixed top-0 right-0 z-50 h-full w-80 border-l shadow-2xl"
             >
               <div className="flex h-full flex-col">
-                <div className="flex items-center justify-between border-b p-6 dark:border-zinc-800">
-                  <h2 className="text-xl font-bold">Favorites</h2>
+                <div className="border-border flex items-center justify-between border-b p-6">
+                  <h2 className="text-foreground text-xl font-bold drop-shadow-md">
+                    Favorites
+                  </h2>
                   <div className="flex gap-2">
                     {favorites.length > 0 && (
                       <Button
@@ -90,14 +92,14 @@ export const FavoritesSidebar = ({
                         <motion.div
                           layout
                           key={hex}
-                          className="group flex items-center justify-between rounded-xl border p-2 pr-4 transition-all hover:shadow-md dark:border-zinc-800"
+                          className="glass-pill group hover:bg-muted/60 flex items-center justify-between rounded-2xl p-2 pr-4 transition-all hover:shadow-lg"
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className="h-12 w-12 rounded-lg border shadow-sm dark:border-zinc-700"
+                              className="border-border h-12 w-12 rounded-xl border shadow-inner"
                               style={{ backgroundColor: hex }}
                             />
-                            <span className="font-mono font-bold tracking-wider uppercase">
+                            <span className="text-foreground font-mono font-bold tracking-wider uppercase drop-shadow-sm">
                               {hex}
                             </span>
                           </div>

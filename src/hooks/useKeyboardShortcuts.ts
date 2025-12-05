@@ -3,6 +3,9 @@ import { usePaletteStore } from "@/store/usePaletteStore";
 
 export const useKeyboardShortcuts = () => {
   const generatePalette = usePaletteStore((s) => s.generatePalette);
+  const canRegenerate = usePaletteStore(
+    (s) => s.colors.length === 0 || s.colors.some((color) => !color.isLocked)
+  );
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -15,11 +18,13 @@ export const useKeyboardShortcuts = () => {
 
       if (e.code === "Space") {
         e.preventDefault();
-        generatePalette();
+        if (canRegenerate) {
+          generatePalette();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [generatePalette]);
+  }, [canRegenerate, generatePalette]);
 };
