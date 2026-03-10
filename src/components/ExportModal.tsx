@@ -80,6 +80,7 @@ export const ExportModal = ({
             aria-labelledby={titleId}
             aria-describedby={descriptionId}
             tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
             className="glass-card max-h-[calc(100vh-2rem)] w-[90vw] max-w-2xl overflow-hidden rounded-3xl p-6 shadow-2xl"
           >
             <p id={descriptionId} className="sr-only">
