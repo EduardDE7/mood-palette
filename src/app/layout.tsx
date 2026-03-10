@@ -9,8 +9,23 @@ const ubuntu = Ubuntu({
 });
 
 export const metadata: Metadata = {
-  title: "Colors",
-  description: "",
+  title: "MoodPalette | Color Generator & Editor",
+  description:
+    "Generate, edit, and export stunning color palettes instantly. Perfect for designers and developers looking for seamless workflow integration with CSS and Tailwind export.",
+  keywords: [
+    "color palette",
+    "design system",
+    "color generator",
+    "tailwind colors",
+    "css variables",
+    "ui design",
+  ],
+  authors: [{ name: "Eduard" }],
+  openGraph: {
+    title: "MoodPalette | Color Generator",
+    description: "Generate and export stunning color palettes instantly.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
