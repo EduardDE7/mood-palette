@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Lock, Unlock, Trash2, Copy, Heart } from "lucide-react";
-import { motion } from "framer-motion";
 import { getContrastColor } from "@/utils/colors";
-import { usePaletteStore } from "@/store/usePaletteStore";
-import { Button } from "@/components";
+import {
+  type FavoriteLocation,
+  usePaletteStore,
+} from "@/store/usePaletteStore";
+import { Button, SaveFavoriteColorModal } from "@/components";
 
 interface ColorColumnProps {
   id: string;
@@ -19,23 +21,42 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
   const updateColor = usePaletteStore((s) => s.updateColor);
   const colorsCount = usePaletteStore((s) => s.colors.length);
   const favorites = usePaletteStore((s) => s.favorites);
+  const favoritePalettes = usePaletteStore((s) => s.favoritePalettes);
   const addFavorite = usePaletteStore((s) => s.addFavorite);
-  const removeFavorite = usePaletteStore((s) => s.removeFavorite);
+  const removeFavoriteEverywhere = usePaletteStore(
+    (s) => s.removeFavoriteEverywhere
+  );
+  const createFavoritePalette = usePaletteStore((s) => s.createFavoritePalette);
 
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(hex);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const contrastColor = getContrastColor(hex);
 
-  const isFavorite = favorites.includes(hex.toUpperCase());
+  const normalizedHex = hex.toUpperCase();
+  const isFavoriteInDefault = favorites.includes(normalizedHex);
+  const isFavoriteInPalettes = favoritePalettes.some((palette) =>
+    palette.colors.includes(normalizedHex)
+  );
+  const isFavorite = isFavoriteInDefault || isFavoriteInPalettes;
   const canDelete = colorsCount > 2;
 
   const toggleFavorite = () => {
     if (isFavorite) {
-      removeFavorite(hex);
+      removeFavoriteEverywhere(hex);
     } else {
-      addFavorite(hex);
+      setIsSaveModalOpen(true);
     }
+  };
+
+  const handleSaveToDestination = (destination: FavoriteLocation) => {
+    if (destination.type === "default") {
+      addFavorite(hex);
+      return;
+    }
+
+    addFavorite(hex, destination.paletteId);
   };
 
   const copyToClipboard = async () => {
@@ -74,20 +95,16 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
   };
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-      className="group relative flex flex-1 flex-col items-center justify-center"
+    <div
+      className="group relative flex h-full w-full flex-1 flex-col items-center justify-center"
       style={{ backgroundColor: hex, color: contrastColor }}
     >
       <div
-        className={`glass-card pointer-events-none absolute inset-0 z-20 flex items-center justify-center border-none transition-opacity duration-300 ${
+        className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-300 ${
           copied ? "opacity-100" : "opacity-0"
         }`}
       >
-        <span className="text-foreground text-xl font-bold tracking-widest uppercase shadow-black drop-shadow-md">
+        <span className="text-xl font-bold tracking-widest uppercase drop-shadow-md">
           Copied!
         </span>
       </div>
@@ -111,11 +128,13 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
             size="icon"
             onClick={toggleFavorite}
             style={{ color: contrastColor }}
-            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            title={
+              isFavorite ? "Remove from favorites" : "Save color to favorites"
+            }
             aria-label={
               isFavorite
                 ? "Remove color from favorites"
-                : "Add color to favorites"
+                : "Save color to favorites"
             }
             className="h-9 w-9 bg-transparent shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:shadow-none"
           >
@@ -166,8 +185,7 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
             style={{ color: contrastColor }}
           />
         ) : (
-          <motion.h2
-            layout="position"
+          <h2
             className="cursor-pointer text-2xl font-bold tracking-wider uppercase transition-transform select-none hover:scale-110"
             onClick={startEditing}
             onContextMenu={(e) => {
@@ -177,9 +195,18 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
             title="Click to edit, Right-click to copy"
           >
             {hex.replace("#", "")}
-          </motion.h2>
+          </h2>
         )}
       </div>
-    </motion.div>
+
+      <SaveFavoriteColorModal
+        colorHex={hex}
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        palettes={favoritePalettes}
+        onCreatePalette={createFavoritePalette}
+        onSave={handleSaveToDestination}
+      />
+    </div>
   );
 };

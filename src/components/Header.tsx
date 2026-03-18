@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Palette, Plus, Heart, Download } from "lucide-react";
+import { Palette, Plus, Heart, Download, Save } from "lucide-react";
 import { Button, ExportModal } from "@/components";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
@@ -10,6 +10,9 @@ interface HeaderProps {
 export const Header = ({ onOpenFavorites }: HeaderProps) => {
   const addColor = usePaletteStore((state) => state.addColor);
   const colors = usePaletteStore((state) => state.colors);
+  const saveCurrentPaletteToFavorites = usePaletteStore(
+    (state) => state.saveCurrentPaletteToFavorites
+  );
 
   const [isExportOpen, setIsExportOpen] = useState(false);
 
@@ -33,6 +36,18 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
           to generate!
         </p>
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            round
+            onClick={saveCurrentPaletteToFavorites}
+            title="Save current palette to favorites"
+            aria-label="Save current palette to favorites"
+          >
+            <Save size={16} />
+            Save Palette
+          </Button>
+
           <Button
             variant="ghost"
             size="sm"

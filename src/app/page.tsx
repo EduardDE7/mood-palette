@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { motion } from "framer-motion";
 
 import { usePaletteStore } from "@/store/usePaletteStore";
 import {
   Header,
-  ColorColumn,
+  SortableColorColumn,
   FavoritesSidebar,
   RegenerateButton,
 } from "@/components";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts, usePaletteDnd } from "@/hooks";
 
 const STAGGER_TRANSITION = {
   staggerChildren: 0.05,
@@ -21,6 +26,10 @@ export default function Home() {
   const colors = usePaletteStore((s) => s.colors);
   const generatePalette = usePaletteStore((s) => s.generatePalette);
   const syncWithUrl = usePaletteStore((s) => s.syncWithUrl);
+
+  const colorIds = useMemo(() => colors.map((color) => color.id), [colors]);
+  const { activeId, handleDragEnd, handleDragStart, sensors } =
+    usePaletteDnd(colorIds);
 
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
@@ -37,6 +46,7 @@ export default function Home() {
       <motion.main
         initial="initial"
         animate="animate"
+        aria-describedby="palette-dnd-instructions"
         variants={{
           animate: {
             transition: STAGGER_TRANSITION,
@@ -44,11 +54,26 @@ export default function Home() {
         }}
         className="flex flex-1 overflow-hidden"
       >
-        <AnimatePresence mode="popLayout" initial={false}>
-          {colors.map((color) => (
-            <ColorColumn key={color.id} {...color} />
-          ))}
-        </AnimatePresence>
+        <p id="palette-dnd-instructions" className="sr-only">
+          Reorder colors with drag handles. Focus a handle, press Space to pick
+          up a color, use arrow keys to move, and press Space again to drop.
+        </p>
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={colorIds}
+            strategy={horizontalListSortingStrategy}
+          >
+            {colors.map((color) => (
+              <SortableColorColumn key={color.id} {...color} />
+            ))}
+          </SortableContext>
+        </DndContext>
       </motion.main>
 
       <RegenerateButton colors={colors} onRegenerate={generatePalette} />
