@@ -17,8 +17,8 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
 
   return (
-    <header className="glass-card fixed top-6 left-1/2 z-50 flex h-16 w-[95%] max-w-5xl -translate-x-1/2 items-center justify-between rounded-full px-6 shadow-2xl sm:w-[90%]">
-      <div className="flex items-center gap-3">
+    <header className="glass-card fixed top-6 left-1/2 z-50 flex h-14 w-[95%] max-w-5xl -translate-x-1/2 items-center justify-between rounded-full px-2 shadow-2xl sm:w-[90%] sm:px-3">
+      <div className="flex items-center gap-2">
         <div className="bg-muted/20 text-foreground rounded-full p-2 shadow-inner">
           <Palette size={20} />
         </div>
@@ -27,14 +27,7 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
         </h1>
       </div>
 
-      <div className="flex items-center gap-4">
-        <p className="text-muted-foreground hidden text-sm sm:block">
-          Press{" "}
-          <kbd className="bg-muted/20 text-foreground rounded-md px-2 py-1 font-sans text-xs shadow-inner">
-            Space
-          </kbd>{" "}
-          to generate!
-        </p>
+      <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"

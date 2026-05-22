@@ -1,21 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Unlock, Trash2, Copy, Heart } from "lucide-react";
-import { getContrastColor } from "@/utils/colors";
+import { Copy, GripVertical, Heart, Lock, Trash2, Unlock } from "lucide-react";
+import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
 import {
   type FavoriteLocation,
   usePaletteStore,
 } from "@/store/usePaletteStore";
 import { Button, SaveFavoriteColorModal } from "@/components";
+import { getContrastColor } from "@/utils/colors";
 
 interface ColorColumnProps {
   id: string;
   hex: string;
   isLocked: boolean;
+  dragAttributes?: DraggableAttributes;
+  dragListeners?: DraggableSyntheticListeners;
+  dragActivatorRef?: (node: HTMLElement | null) => void;
 }
 
-export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
+export const ColorColumn = ({
+  id,
+  hex,
+  isLocked,
+  dragAttributes,
+  dragListeners,
+  dragActivatorRef,
+}: ColorColumnProps) => {
   const toggleLock = usePaletteStore((s) => s.toggleLock);
   const removeColor = usePaletteStore((s) => s.removeColor);
   const updateColor = usePaletteStore((s) => s.updateColor);
@@ -111,6 +122,27 @@ export const ColorColumn = ({ id, hex, isLocked }: ColorColumnProps) => {
 
       <div className="z-10 flex flex-col items-center gap-6">
         <div className="flex flex-col gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <Button
+            {...dragAttributes}
+            {...dragListeners}
+            ref={dragActivatorRef}
+            variant="action"
+            size="icon"
+            title="Drag to reorder color"
+            aria-label="Drag to reorder color"
+            className="h-9 w-9 cursor-grab rounded-full border border-white/20 backdrop-blur-sm transition-all duration-150 ease-out hover:bg-white/20 active:scale-105 active:cursor-grabbing"
+            style={{
+              touchAction: "none",
+              color: contrastColor === "white" ? "#FFFFFF" : "#111111",
+              backgroundColor:
+                contrastColor === "white"
+                  ? "rgba(0,0,0,0.35)"
+                  : "rgba(255,255,255,0.55)",
+            }}
+          >
+            <GripVertical size={18} />
+          </Button>
+
           <Button
             variant="ghost"
             size="icon"
