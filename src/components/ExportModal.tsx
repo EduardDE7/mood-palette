@@ -135,12 +135,12 @@ export const ExportModal = ({
               </pre>
 
               <Button
-                variant="action"
+                variant="ghost"
                 size="icon"
                 onClick={handleCopy}
                 title={copied ? "Code copied" : "Copy code"}
                 aria-label={copied ? "Code copied" : "Copy code"}
-                className="glass-pill hover:bg-muted/40 absolute top-2 right-2 shadow-sm"
+                className="absolute top-2 right-2 h-10 w-10"
               >
                 {copied ? (
                   <Check size={18} className="text-green-400" />

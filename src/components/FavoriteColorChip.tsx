@@ -73,10 +73,10 @@ export const FavoriteColorChip = ({
         <Button
           {...attributes}
           {...listeners}
-          variant="action"
+          variant="ghost"
           size="icon"
           round
-          className="hover:bg-accent/20 h-7 w-7 cursor-grab transition-all duration-150 ease-out active:scale-105 active:cursor-grabbing"
+          className="h-7 w-7 cursor-grab active:cursor-grabbing"
           style={{ touchAction: "none" }}
           title="Drag color to another palette"
           aria-label="Drag color to another palette"
@@ -85,7 +85,7 @@ export const FavoriteColorChip = ({
         </Button>
 
         <Button
-          variant="action"
+          variant="ghost"
           size="icon"
           round
           onClick={() => onCopy(hex)}
@@ -97,7 +97,7 @@ export const FavoriteColorChip = ({
         </Button>
 
         <Button
-          variant="danger"
+          variant="ghost"
           size="icon"
           round
           onClick={() => onRemove(hex, location)}

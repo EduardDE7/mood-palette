@@ -1,4 +1,5 @@
 export * from "./Header";
+export * from "./BrandLogo";
 export * from "./ColorColumn";
 export * from "./SortableColorColumn";
 export * from "./SaveFavoriteColorModal";

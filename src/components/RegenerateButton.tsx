@@ -25,7 +25,7 @@ export const RegenerateButton = ({
   const paletteSignature = colors.map((color) => color.hex).join("-");
 
   const title = canRegenerate
-    ? "Regenerate palette (Space)"
+    ? "Press Space to regenerate palette"
     : "All colors are locked. Unlock at least one color.";
 
   const helperText =
@@ -36,7 +36,7 @@ export const RegenerateButton = ({
         : "Unlock at least one color";
 
   return (
-    <div className="absolute bottom-8 left-1/2 z-30 -translate-x-1/2">
+    <div className="absolute bottom-6 left-1/2 z-30 -translate-x-1/2">
       <motion.div
         whileHover={canRegenerate ? { scale: 1.02 } : undefined}
         whileTap={canRegenerate ? { scale: 0.98 } : undefined}
@@ -57,14 +57,14 @@ export const RegenerateButton = ({
           aria-label="Regenerate palette"
           aria-describedby={helperTextId}
           aria-keyshortcuts="Space"
-          className="relative flex h-auto min-w-[22rem] items-center justify-between gap-4 overflow-hidden border border-accent/70 bg-gradient-to-br from-background/95 to-accent/80 px-6 py-3 text-left text-foreground shadow-xl backdrop-blur-xl transition-colors hover:border-primary/65 hover:from-background/95 hover:to-accent/90 disabled:cursor-not-allowed"
+          className="relative flex h-auto min-w-[20rem] items-center justify-between gap-3 overflow-hidden border border-accent/70 bg-gradient-to-br from-background/95 to-accent/80 px-2 py-2 text-left text-foreground shadow-xl backdrop-blur-xl transition-colors hover:border-primary/65 hover:from-background/95 hover:to-accent/90 disabled:cursor-not-allowed"
         >
-          <span className="flex items-center gap-3">
+          <span className="flex items-center gap-2">
             <motion.span
               key={paletteSignature}
               animate={canRegenerate ? { rotate: [0, 180] } : { rotate: 0 }}
               transition={{ duration: 0.45, ease: "anticipate" }}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent/65"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/65"
             >
               {canRegenerate ? (
                 <RefreshCw size={18} strokeWidth={2.5} />
@@ -86,9 +86,9 @@ export const RegenerateButton = ({
             </span>
           </span>
 
-          <kbd className="hidden rounded-full bg-foreground/92 px-2.5 py-0.5 text-xs font-bold tracking-wide text-background sm:inline-flex">
-            Space
-          </kbd>
+          <span className="hidden h-9 items-center rounded-full border border-white/70 bg-white/95 px-3 text-xs font-medium leading-none tracking-normal text-slate-950 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-xl sm:inline-flex">
+            Press Space
+          </span>
         </Button>
       </motion.div>
     </div>

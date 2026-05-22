@@ -126,19 +126,13 @@ export const ColorColumn = ({
             {...dragAttributes}
             {...dragListeners}
             ref={dragActivatorRef}
-            variant="action"
+            variant="ghost"
             size="icon"
+            round
             title="Drag to reorder color"
             aria-label="Drag to reorder color"
-            className="h-9 w-9 cursor-grab rounded-full border border-white/20 backdrop-blur-sm transition-all duration-150 ease-out hover:bg-white/20 active:scale-105 active:cursor-grabbing"
-            style={{
-              touchAction: "none",
-              color: contrastColor === "white" ? "#FFFFFF" : "#111111",
-              backgroundColor:
-                contrastColor === "white"
-                  ? "rgba(0,0,0,0.35)"
-                  : "rgba(255,255,255,0.55)",
-            }}
+            className="h-9 w-9 cursor-grab active:cursor-grabbing"
+            style={{ touchAction: "none", color: contrastColor }}
           >
             <GripVertical size={18} />
           </Button>
@@ -146,18 +140,20 @@ export const ColorColumn = ({
           <Button
             variant="ghost"
             size="icon"
+            round
             onClick={() => toggleLock(id)}
             style={{ color: contrastColor }}
             title={isLocked ? "Unlock" : "Lock"}
             aria-label={isLocked ? "Unlock color" : "Lock color"}
-            className="h-9 w-9 bg-transparent shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:shadow-none"
+            className="h-9 w-9"
           >
-            {isLocked ? <Lock size={20} /> : <Unlock size={20} />}
+            {isLocked ? <Lock size={18} /> : <Unlock size={18} />}
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
+            round
             onClick={toggleFavorite}
             style={{ color: contrastColor }}
             title={
@@ -168,11 +164,10 @@ export const ColorColumn = ({
                 ? "Remove color from favorites"
                 : "Save color to favorites"
             }
-            className="h-9 w-9 bg-transparent shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:shadow-none"
+            className="h-9 w-9"
           >
             <Heart
-              size={22}
-              className="drop-shadow-sm"
+              size={18}
               fill={isFavorite ? contrastColor : "none"}
             />
           </Button>
@@ -180,25 +175,27 @@ export const ColorColumn = ({
           <Button
             variant="ghost"
             size="icon"
+            round
             onClick={copyToClipboard}
             style={{ color: contrastColor }}
             title="Copy HEX"
             aria-label="Copy color HEX value"
-            className="h-9 w-9 bg-transparent shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:shadow-none"
+            className="h-9 w-9"
           >
-            <Copy size={20} />
+            <Copy size={18} />
           </Button>
 
           {canDelete && (
             <Button
               variant="ghost"
               size="icon"
+              round
               onClick={() => removeColor(id)}
               title="Remove color"
               aria-label="Remove color"
-              className="h-9 w-9 bg-transparent text-red-500 shadow-none backdrop-blur-none hover:scale-110 hover:bg-transparent hover:text-red-400 hover:shadow-none"
+              className="h-9 w-9"
             >
-              <Trash2 size={20} />
+              <Trash2 size={18} />
             </Button>
           )}
         </div>

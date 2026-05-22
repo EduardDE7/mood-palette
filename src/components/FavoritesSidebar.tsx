@@ -311,7 +311,7 @@ export const FavoritesSidebar = ({
 
                                   <div className="flex gap-1">
                                     <Button
-                                      variant="action"
+                                      variant="ghost"
                                       size="icon"
                                       round
                                       onClick={() =>
@@ -326,7 +326,7 @@ export const FavoritesSidebar = ({
 
                                     {isEditing ? (
                                       <Button
-                                        variant="action"
+                                        variant="ghost"
                                         size="icon"
                                         round
                                         onClick={() =>
@@ -340,7 +340,7 @@ export const FavoritesSidebar = ({
                                       </Button>
                                     ) : (
                                       <Button
-                                        variant="action"
+                                        variant="ghost"
                                         size="icon"
                                         round
                                         onClick={() =>
@@ -355,13 +355,13 @@ export const FavoritesSidebar = ({
                                     )}
 
                                     <Button
-                                      variant="danger"
+                                      variant="ghost"
                                       size="icon"
                                       round
                                       onClick={() =>
                                         removeFavoritePalette(palette.id)
                                       }
-                                      className="h-7 w-7"
+                                      className="h-7 w-7 text-red-500 hover:text-red-400"
                                       title="Delete palette"
                                       aria-label="Delete palette"
                                     >

@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🎨 MoodPalette
+# 🎨 Palettrix
 
-![MoodPalette Preview](./public/screenshots/app-preview.png)
+![Palettrix Preview](./public/screenshots/app-preview.png)
 
 A modern, fast, and beautiful color palette generator and editor built for designers and developers.
 
@@ -28,7 +28,7 @@ A modern, fast, and beautiful color palette generator and editor built for desig
 
 ## 🎯 About the Project
 
-**MoodPalette** is a lightning-fast tool for generating, editing, and exporting stunning color palettes. It brings the best practices of modern web development and design systems into a seamless, interactive experience. Tweak colors, lock favorites, and export them directly to your CSS or Tailwind configuration.
+**Palettrix** is a lightning-fast tool for generating, editing, and exporting stunning color palettes. It brings the best practices of modern web development and design systems into a seamless, interactive experience. Tweak colors, lock favorites, and export them directly to your CSS or Tailwind configuration.
 
 ## ✨ Key Features
 

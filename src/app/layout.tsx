@@ -9,7 +9,7 @@ const ubuntu = Ubuntu({
 });
 
 export const metadata: Metadata = {
-  title: "MoodPalette | Color Generator & Editor",
+  title: "Palettrix | Color Generator & Editor",
   description:
     "Generate, edit, and export stunning color palettes instantly. Perfect for designers and developers looking for seamless workflow integration with CSS and Tailwind export.",
   keywords: [
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Eduard" }],
   openGraph: {
-    title: "MoodPalette | Color Generator",
+    title: "Palettrix | Color Generator",
     description: "Generate and export stunning color palettes instantly.",
     type: "website",
   },
