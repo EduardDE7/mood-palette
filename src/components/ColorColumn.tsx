@@ -1,17 +1,63 @@
 "use client";
 
-import { useState } from "react";
-import { Copy, GripVertical, Heart, Lock, Trash2, Unlock } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Copy,
+  GripVertical,
+  Heart,
+  Lock,
+  Palette,
+  Trash2,
+  Unlock,
+} from "lucide-react";
 import type {
   DraggableAttributes,
   DraggableSyntheticListeners,
 } from "@dnd-kit/core";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   type FavoriteLocation,
   usePaletteStore,
 } from "@/store/usePaletteStore";
 import { Button, SaveFavoriteColorModal } from "@/components";
-import { getContrastColor } from "@/utils/colors";
+import { generateShades, getContrastColor } from "@/utils/colors";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.02,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      staggerChildren: 0.01,
+      staggerDirection: -1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 30,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: {
+      duration: 0.15,
+    },
+  },
+};
 
 interface ColorColumnProps {
   id: string;
@@ -45,9 +91,21 @@ export const ColorColumn = ({
 
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showShades, setShowShades] = useState(false);
   const [editValue, setEditValue] = useState(hex);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const contrastColor = getContrastColor(hex);
+
+  useEffect(() => {
+    if (!showShades) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowShades(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showShades]);
 
   const normalizedHex = hex.toUpperCase();
   const isFavoriteInDefault = favorites.includes(normalizedHex);
@@ -181,6 +239,19 @@ export const ColorColumn = ({
             variant="ghost"
             size="icon"
             round
+            onClick={() => setShowShades(!showShades)}
+            style={{ color: contrastColor }}
+            title="View color shades"
+            aria-label="View color shades"
+            className="h-9 w-9 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          >
+            <Palette size={18} />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            round
             onClick={() => duplicateColor(id)}
             disabled={colorsCount >= 8}
             style={{ color: contrastColor }}
@@ -269,6 +340,52 @@ export const ColorColumn = ({
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {showShades && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="absolute inset-0 z-30 flex flex-col overflow-hidden pt-24"
+          >
+            {/* Shades grid stack */}
+            <div className="flex h-full w-full flex-col">
+              {generateShades(hex).map((shade) => {
+                const isCurrent = shade.toUpperCase() === hex.toUpperCase();
+                const shadeContrast = getContrastColor(shade);
+                return (
+                  <motion.button
+                    key={shade}
+                    variants={itemVariants}
+                    style={{ backgroundColor: shade, color: shadeContrast }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      updateColor(id, shade);
+                      setShowShades(false);
+                    }}
+                    className="group/shade relative flex flex-1 w-full items-center justify-center border-none outline-none transition-[flex] duration-[600ms] ease-[cubic-bezier(0.19,1,0.22,1)] hover:flex-[3] hover:shadow-lg active:scale-98 cursor-pointer focus-visible:z-40 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
+                    title={`Apply shade ${shade}`}
+                    aria-label={`Apply shade ${shade}`}
+                  >
+                    <div className="pointer-events-none flex items-center gap-1.5 select-none">
+                      {isCurrent && (
+                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: shadeContrast }} />
+                      )}
+                      <span className={`font-mono text-[10px] md:text-xs font-bold tracking-wide uppercase transition-all duration-200 ${
+                        isCurrent ? "opacity-100 scale-105" : "opacity-0 group-hover/shade:opacity-100 group-focus-visible/shade:opacity-100"
+                      }`}>
+                        {shade.replace("#", "")}
+                      </span>
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <SaveFavoriteColorModal
         colorHex={hex}

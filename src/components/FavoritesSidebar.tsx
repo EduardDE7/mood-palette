@@ -6,6 +6,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Copy,
   Download,
   FolderPlus,
   Pencil,
@@ -28,6 +29,42 @@ import {
   SavePaletteModal,
 } from "@/components";
 import { useFavoritesDnd } from "@/hooks";
+import { getContrastColor } from "@/utils/colors";
+
+const CollapsedSwatch = ({
+  hex,
+  onCopy,
+}: {
+  hex: string;
+  onCopy: (hex: string) => void;
+}) => {
+  const [copied, setCopied] = useState(false);
+  const contrastColor = getContrastColor(hex);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCopy(hex);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="border-border relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-115 hover:shadow-md active:scale-95 group/swatch focus:outline-none focus:ring-1 focus:ring-ring"
+      style={{ backgroundColor: hex }}
+      title={`Click to copy: ${hex}`}
+      aria-label={`Copy color ${hex}`}
+    >
+      <div
+        className="pointer-events-none flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover/swatch:opacity-100"
+        style={{ color: contrastColor }}
+      >
+        {copied ? <Check size={12} strokeWidth={2.5} /> : <Copy size={12} />}
+      </div>
+    </button>
+  );
+};
 
 interface FavoritesSidebarProps {
   isOpen: boolean;
@@ -66,6 +103,7 @@ export const FavoritesSidebar = ({
   const [editingPaletteId, setEditingPaletteId] = useState<string | null>(null);
   const [paletteNameDraft, setPaletteNameDraft] = useState("");
   const [expandedPaletteIds, setExpandedPaletteIds] = useState<string[]>([]);
+  const [isDefaultExpanded, setIsDefaultExpanded] = useState(false);
   const { activeHex, handleDragEnd, handleDragStart, sensors } =
     useFavoritesDnd();
 
@@ -236,34 +274,64 @@ export const FavoritesSidebar = ({
                 >
                   <div className="flex-1 space-y-6 overflow-y-auto p-5">
                     <section>
-                      <div className="mb-2 flex items-center justify-between">
+                      <div className="mb-3 flex items-center justify-between gap-2">
                         <h3 className="text-foreground text-sm font-semibold tracking-wide uppercase">
                           Default Palette
                         </h3>
-                        <span className="text-muted-foreground text-xs">
-                          {favorites.length} colors
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground text-xs mr-1">
+                            {favorites.length} colors
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            round
+                            onClick={() => setIsDefaultExpanded(!isDefaultExpanded)}
+                            className="h-7 w-7"
+                            title={isDefaultExpanded ? "Collapse default palette" : "Expand default palette"}
+                            aria-label={isDefaultExpanded ? "Collapse default palette" : "Expand default palette"}
+                            aria-expanded={isDefaultExpanded}
+                          >
+                            {isDefaultExpanded ? (
+                              <ChevronUp size={14} />
+                            ) : (
+                              <ChevronDown size={14} />
+                            )}
+                          </Button>
+                        </div>
                       </div>
 
                       <FavoriteDropContainer
                         location={{ type: "default" }}
-                        className="min-h-20 space-y-2 rounded-2xl p-2 transition-all"
+                        className="rounded-2xl p-2 transition-all"
                         activeClassName="ring-primary/65 border-primary/60 ring-2"
                       >
                         {favorites.length === 0 ? (
                           <p className="text-muted-foreground px-2 py-4 text-sm">
                             Saved standalone colors will appear here.
                           </p>
+                        ) : isDefaultExpanded ? (
+                          <div className="space-y-2">
+                            {favorites.map((hex) => (
+                              <FavoriteColorChip
+                                key={`default-${hex}`}
+                                hex={hex}
+                                location={{ type: "default" }}
+                                onCopy={copyToClipboard}
+                                onRemove={handleRemoveColor}
+                              />
+                            ))}
+                          </div>
                         ) : (
-                          favorites.map((hex) => (
-                            <FavoriteColorChip
-                              key={`default-${hex}`}
-                              hex={hex}
-                              location={{ type: "default" }}
-                              onCopy={copyToClipboard}
-                              onRemove={handleRemoveColor}
-                            />
-                          ))
+                          <div className="flex min-h-8 flex-wrap items-center gap-2">
+                            {favorites.map((hex) => (
+                              <CollapsedSwatch
+                                key={`default-collapsed-${hex}`}
+                                hex={hex}
+                                onCopy={copyToClipboard}
+                              />
+                            ))}
+                          </div>
                         )}
                       </FavoriteDropContainer>
                     </section>
@@ -430,12 +498,10 @@ export const FavoritesSidebar = ({
                                       </p>
                                     ) : (
                                       palette.colors.map((hex, index) => (
-                                        <span
+                                        <CollapsedSwatch
                                           key={`${palette.id}-swatch-${hex}-${index}`}
-                                          className="border-border h-7 w-7 rounded-full border"
-                                          style={{ backgroundColor: hex }}
-                                          title={hex}
-                                          aria-label={hex}
+                                          hex={hex}
+                                          onCopy={copyToClipboard}
                                         />
                                       ))
                                     )}

@@ -88,27 +88,36 @@ const areColorSnapshotsEqual = (
   });
 };
 
-const getHistoryWithCurrentColors = (state: PaletteState) => {
-  const currentSnapshot = cloneColors(state.colors);
+const updateUrlHash = (colors: ColorItem[]) => {
+  if (typeof window === "undefined") return;
+  const hash = colors.map((c) => c.hex.replace("#", "")).join("-");
+  window.history.replaceState(null, "", `#${hash}`);
+};
 
-  if (currentSnapshot.length === 0) {
-    return [];
+const commitColors = (
+  state: PaletteState,
+  newColors: ColorItem[],
+  extraState = {}
+) => {
+  if (areColorSnapshotsEqual(state.colors, newColors)) {
+    return {};
   }
 
-  if (state.paletteHistory.length === 0 || state.paletteHistoryIndex < 0) {
-    return [currentSnapshot];
-  }
+  // Отрезаем ветку Redo, если пользователь вернулся назад и сделал новое изменение
+  const truncatedHistory = state.paletteHistory.slice(
+    0,
+    state.paletteHistoryIndex + 1
+  );
+  const nextHistory = [...truncatedHistory, cloneColors(newColors)];
 
-  const history = state.paletteHistory
-    .slice(0, state.paletteHistoryIndex + 1)
-    .map(cloneColors);
-  const currentHistorySnapshot = history[history.length - 1];
+  updateUrlHash(newColors);
 
-  if (!areColorSnapshotsEqual(currentHistorySnapshot, state.colors)) {
-    history[history.length - 1] = currentSnapshot;
-  }
-
-  return history;
+  return {
+    colors: newColors,
+    paletteHistory: nextHistory.map(cloneColors),
+    paletteHistoryIndex: nextHistory.length - 1,
+    ...extraState,
+  };
 };
 
 const isSameLocation = (source: FavoriteLocation, target: FavoriteLocation) => {
@@ -204,12 +213,6 @@ const removeColorFromPaletteById = (
   return { hasChanged, updatedPalettes };
 };
 
-const updateUrlHash = (colors: ColorItem[]) => {
-  if (typeof window === "undefined") return;
-  const hash = colors.map((c) => c.hex.replace("#", "")).join("-");
-  window.history.replaceState(null, "", `#${hash}`);
-};
-
 export const usePaletteStore = create<PaletteState>()(
   persist(
     (set, get) => ({
@@ -273,19 +276,10 @@ export const usePaletteStore = create<PaletteState>()(
             };
           }
 
-          const nextHistory = [
-            ...getHistoryWithCurrentColors(state),
-            newColors,
-          ];
-
-          return {
-            colors: newColors,
+          return commitColors(state, newColors, {
             generationCount: state.generationCount + 1,
-            paletteHistory: nextHistory.map(cloneColors),
-            paletteHistoryIndex: nextHistory.length - 1,
-          };
+          });
         });
-        updateUrlHash(newColors);
       },
 
       canGoBackInPaletteHistory: () => get().paletteHistoryIndex > 0,
@@ -343,8 +337,7 @@ export const usePaletteStore = create<PaletteState>()(
             return state;
           }
 
-          updateUrlHash(newColors);
-          return { colors: newColors };
+          return commitColors(state, newColors);
         });
       },
 
@@ -353,7 +346,7 @@ export const usePaletteStore = create<PaletteState>()(
           const newColors = state.colors.map((color) =>
             color.id === id ? { ...color, isLocked: !color.isLocked } : color
           );
-          return { colors: newColors };
+          return commitColors(state, newColors);
         });
       },
 
@@ -363,8 +356,7 @@ export const usePaletteStore = create<PaletteState>()(
           const newColors = state.colors.map((color) =>
             color.id === id ? { ...color, hex: normalizedHex } : color
           );
-          updateUrlHash(newColors);
-          return { colors: newColors };
+          return commitColors(state, newColors);
         });
       },
 
@@ -372,8 +364,7 @@ export const usePaletteStore = create<PaletteState>()(
         set((state) => {
           if (state.colors.length <= 2) return state;
           const newColors = state.colors.filter((c) => c.id !== id);
-          updateUrlHash(newColors);
-          return { colors: newColors };
+          return commitColors(state, newColors);
         });
       },
 
@@ -393,8 +384,7 @@ export const usePaletteStore = create<PaletteState>()(
           const newColors = [...state.colors];
           newColors.splice(index + 1, 0, newColor);
 
-          updateUrlHash(newColors);
-          return { colors: newColors };
+          return commitColors(state, newColors);
         });
       },
 
@@ -409,8 +399,7 @@ export const usePaletteStore = create<PaletteState>()(
               isLocked: false,
             },
           ];
-          updateUrlHash(newColors);
-          return { colors: newColors };
+          return commitColors(state, newColors);
         });
       },
 
@@ -652,10 +641,7 @@ export const usePaletteStore = create<PaletteState>()(
             isLocked: false,
           }));
 
-          updateUrlHash(nextColors);
-          return {
-            colors: nextColors,
-          };
+          return commitColors(state, nextColors);
         });
       },
 
