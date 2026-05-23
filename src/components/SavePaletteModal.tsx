@@ -122,7 +122,7 @@ export const SavePaletteModal = ({
               value={paletteName}
               onChange={(event) => setPaletteName(event.target.value)}
               placeholder="Palette name"
-              className="bg-white/5 text-foreground border-border focus:border-accent/80 focus:ring-accent/60 mb-5 w-full rounded-xl border px-3 py-2 backdrop-blur-sm outline-none focus:ring-2"
+              className="text-foreground border-border focus:border-accent/80 focus:ring-accent/60 mb-5 w-full rounded-xl border bg-transparent px-3 py-2 backdrop-blur-sm outline-none focus:ring-2"
             />
 
             <div className="mb-6 max-h-72 space-y-2 overflow-y-auto pr-1">
@@ -167,7 +167,7 @@ export const SavePaletteModal = ({
                 Cancel
               </Button>
               <Button
-                variant="default"
+                variant="white"
                 size="sm"
                 round
                 onClick={handleSave}

@@ -37,6 +37,7 @@ interface PaletteState {
   toggleLock: (id: string) => void;
   updateColor: (id: string, hex: string) => void;
   removeColor: (id: string) => void;
+  duplicateColor: (id: string) => void;
   addColor: () => void;
   syncWithUrl: () => void;
   addFavorite: (hex: string, paletteId?: string) => void;
@@ -272,7 +273,10 @@ export const usePaletteStore = create<PaletteState>()(
             };
           }
 
-          const nextHistory = [...getHistoryWithCurrentColors(state), newColors];
+          const nextHistory = [
+            ...getHistoryWithCurrentColors(state),
+            newColors,
+          ];
 
           return {
             colors: newColors,
@@ -368,6 +372,27 @@ export const usePaletteStore = create<PaletteState>()(
         set((state) => {
           if (state.colors.length <= 2) return state;
           const newColors = state.colors.filter((c) => c.id !== id);
+          updateUrlHash(newColors);
+          return { colors: newColors };
+        });
+      },
+
+      duplicateColor: (id: string) => {
+        set((state) => {
+          if (state.colors.length >= 8) return state;
+          const index = state.colors.findIndex((color) => color.id === id);
+          if (index === -1) return state;
+
+          const sourceColor = state.colors[index];
+          const newColor = {
+            id: crypto.randomUUID(),
+            hex: sourceColor.hex,
+            isLocked: sourceColor.isLocked,
+          };
+
+          const newColors = [...state.colors];
+          newColors.splice(index + 1, 0, newColor);
+
           updateUrlHash(newColors);
           return { colors: newColors };
         });
