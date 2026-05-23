@@ -71,7 +71,7 @@ export const ExportModal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="bg-background/80 fixed inset-0 z-[60] grid place-items-center p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[60] grid place-items-center bg-black/20 p-4 backdrop-blur-sm"
         >
           <motion.div
             ref={dialogRef}
@@ -113,8 +113,9 @@ export const ExportModal = ({
               {(["css", "tailwind", "json"] as ExportFormat[]).map((f) => (
                 <Button
                   key={f}
-                  variant={format === f ? "default" : "outline"}
+                  variant={format === f ? "white" : "ghost"}
                   size="sm"
+                  round
                   onClick={() => setFormat(f)}
                   className="capitalize"
                   aria-pressed={format === f}
@@ -129,7 +130,7 @@ export const ExportModal = ({
             <div className="group relative mt-6">
               <pre
                 aria-label="Exported color code"
-                className="glass-pill max-h-96 overflow-auto rounded-2xl p-4 text-sm shadow-inner"
+                className="bg-muted/20 max-h-96 overflow-auto rounded-2xl p-4 text-sm"
               >
                 <code>{formattedOutput}</code>
               </pre>
@@ -137,6 +138,7 @@ export const ExportModal = ({
               <Button
                 variant="ghost"
                 size="icon"
+                round
                 onClick={handleCopy}
                 title={copied ? "Code copied" : "Copy code"}
                 aria-label={copied ? "Code copied" : "Copy code"}

@@ -3,6 +3,7 @@ export * from "./BrandLogo";
 export * from "./ColorColumn";
 export * from "./SortableColorColumn";
 export * from "./SaveFavoriteColorModal";
+export * from "./SavePaletteModal";
 export * from "./FavoriteColorChip";
 export * from "./FavoriteDropContainer";
 export * from "./FavoritesSidebar";

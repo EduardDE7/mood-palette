@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   Check,
+  ChevronDown,
+  ChevronUp,
   Download,
   FolderPlus,
   Pencil,
@@ -23,6 +25,7 @@ import {
   ExportModal,
   FavoriteColorChip,
   FavoriteDropContainer,
+  SavePaletteModal,
 } from "@/components";
 import { useFavoritesDnd } from "@/hooks";
 
@@ -50,16 +53,19 @@ export const FavoritesSidebar = ({
   const removeFavoritePalette = usePaletteStore(
     (state) => state.removeFavoritePalette
   );
-  const saveCurrentPaletteToFavorites = usePaletteStore(
-    (state) => state.saveCurrentPaletteToFavorites
+  const savePaletteToFavorites = usePaletteStore(
+    (state) => state.savePaletteToFavorites
   );
   const applyFavoritePalette = usePaletteStore(
     (state) => state.applyFavoritePalette
   );
+  const colors = usePaletteStore((state) => state.colors);
 
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isSavePaletteOpen, setIsSavePaletteOpen] = useState(false);
   const [editingPaletteId, setEditingPaletteId] = useState<string | null>(null);
   const [paletteNameDraft, setPaletteNameDraft] = useState("");
+  const [expandedPaletteIds, setExpandedPaletteIds] = useState<string[]>([]);
   const { activeHex, handleDragEnd, handleDragStart, sensors } =
     useFavoritesDnd();
 
@@ -69,6 +75,11 @@ export const FavoritesSidebar = ({
     );
     return Array.from(new Set([...favorites, ...colorsFromPalettes]));
   }, [favoritePalettes, favorites]);
+
+  const currentPaletteColors = useMemo(
+    () => colors.map((color) => color.hex),
+    [colors]
+  );
 
   const copyToClipboard = async (hex: string) => {
     try {
@@ -84,8 +95,8 @@ export const FavoritesSidebar = ({
     setPaletteNameDraft(createdPalette.name);
   };
 
-  const handleSaveCurrentPalette = () => {
-    const savedPalette = saveCurrentPaletteToFavorites();
+  const handleSaveCurrentPalette = (name: string, paletteColors: string[]) => {
+    const savedPalette = savePaletteToFavorites(name, paletteColors);
 
     if (!savedPalette) {
       return;
@@ -109,6 +120,14 @@ export const FavoritesSidebar = ({
   const cancelRenamePalette = () => {
     setEditingPaletteId(null);
     setPaletteNameDraft("");
+  };
+
+  const togglePaletteCompactView = (paletteId: string) => {
+    setExpandedPaletteIds((currentIds) =>
+      currentIds.includes(paletteId)
+        ? currentIds.filter((currentId) => currentId !== paletteId)
+        : [...currentIds, paletteId]
+    );
   };
 
   const handleRemoveColor = (hex: string, location: FavoriteLocation) => {
@@ -158,11 +177,12 @@ export const FavoritesSidebar = ({
                     </Button>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
-                      onClick={handleSaveCurrentPalette}
+                      round
+                      onClick={() => setIsSavePaletteOpen(true)}
                       title="Save current palette to favorites"
                       aria-label="Save current palette to favorites"
                     >
@@ -171,8 +191,9 @@ export const FavoritesSidebar = ({
                     </Button>
 
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
+                      round
                       onClick={handleCreatePalette}
                       title="Create empty favorite palette"
                       aria-label="Create empty favorite palette"
@@ -226,7 +247,7 @@ export const FavoritesSidebar = ({
 
                       <FavoriteDropContainer
                         location={{ type: "default" }}
-                        className="glass-pill min-h-20 space-y-2 rounded-2xl p-2 transition-all"
+                        className="min-h-20 space-y-2 rounded-2xl p-2 transition-all"
                         activeClassName="ring-primary/65 border-primary/60 ring-2"
                       >
                         {favorites.length === 0 ? (
@@ -258,7 +279,7 @@ export const FavoritesSidebar = ({
                       </div>
 
                       {favoritePalettes.length === 0 ? (
-                        <div className="glass-pill rounded-2xl p-4">
+                        <div className="rounded-2xl p-4">
                           <p className="text-muted-foreground text-sm">
                             Save a full palette or create one manually, then
                             drag colors into it.
@@ -268,6 +289,10 @@ export const FavoritesSidebar = ({
                         <div className="space-y-3">
                           {favoritePalettes.map((palette) => {
                             const isEditing = editingPaletteId === palette.id;
+                            const isExpanded = expandedPaletteIds.includes(
+                              palette.id
+                            );
+                            const isCollapsed = !isExpanded;
                             const location: FavoriteLocation = {
                               type: "palette",
                               paletteId: palette.id,
@@ -277,7 +302,7 @@ export const FavoritesSidebar = ({
                               <FavoriteDropContainer
                                 key={palette.id}
                                 location={location}
-                                className="glass-card rounded-2xl p-3 transition-all"
+                                className="rounded-2xl p-3 transition-all"
                                 activeClassName="ring-primary/65 border-primary/60 ring-2"
                               >
                                 <div className="mb-3 flex items-center justify-between gap-2">
@@ -300,7 +325,7 @@ export const FavoritesSidebar = ({
                                           cancelRenamePalette();
                                         }
                                       }}
-                                      className="bg-muted/20 text-foreground border-border focus:ring-ring w-full rounded-lg border px-2 py-1 text-sm outline-none focus:ring-2"
+                                      className="bg-white/5 text-foreground border-border focus:border-accent/80 focus:ring-accent/60 w-full rounded-lg border px-2 py-1 text-sm backdrop-blur-sm outline-none focus:ring-2"
                                       aria-label="Palette name"
                                     />
                                   ) : (
@@ -310,6 +335,33 @@ export const FavoritesSidebar = ({
                                   )}
 
                                   <div className="flex gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      round
+                                      onClick={() =>
+                                        togglePaletteCompactView(palette.id)
+                                      }
+                                      className="h-7 w-7"
+                                      title={
+                                        isCollapsed
+                                          ? "Expand palette"
+                                          : "Collapse palette"
+                                      }
+                                      aria-label={
+                                        isCollapsed
+                                          ? "Expand palette"
+                                          : "Collapse palette"
+                                      }
+                                      aria-expanded={!isCollapsed}
+                                    >
+                                      {isCollapsed ? (
+                                        <ChevronDown size={14} />
+                                      ) : (
+                                        <ChevronUp size={14} />
+                                      )}
+                                    </Button>
+
                                     <Button
                                       variant="ghost"
                                       size="icon"
@@ -370,24 +422,44 @@ export const FavoritesSidebar = ({
                                   </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                  {palette.colors.length === 0 ? (
-                                    <p className="text-muted-foreground text-xs">
-                                      This palette is empty. Drop colors here or
-                                      use the heart save dialog.
-                                    </p>
-                                  ) : (
-                                    palette.colors.map((hex) => (
-                                      <FavoriteColorChip
-                                        key={`${palette.id}-${hex}`}
-                                        hex={hex}
-                                        location={location}
-                                        onCopy={copyToClipboard}
-                                        onRemove={handleRemoveColor}
-                                      />
-                                    ))
-                                  )}
-                                </div>
+                                {isCollapsed ? (
+                                  <div className="flex min-h-8 flex-wrap items-center gap-2">
+                                    {palette.colors.length === 0 ? (
+                                      <p className="text-muted-foreground text-xs">
+                                        Empty palette
+                                      </p>
+                                    ) : (
+                                      palette.colors.map((hex, index) => (
+                                        <span
+                                          key={`${palette.id}-swatch-${hex}-${index}`}
+                                          className="border-border h-7 w-7 rounded-full border"
+                                          style={{ backgroundColor: hex }}
+                                          title={hex}
+                                          aria-label={hex}
+                                        />
+                                      ))
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2">
+                                    {palette.colors.length === 0 ? (
+                                      <p className="text-muted-foreground text-xs">
+                                        This palette is empty. Drop colors here
+                                        or use the heart save dialog.
+                                      </p>
+                                    ) : (
+                                      palette.colors.map((hex) => (
+                                        <FavoriteColorChip
+                                          key={`${palette.id}-${hex}`}
+                                          hex={hex}
+                                          location={location}
+                                          onCopy={copyToClipboard}
+                                          onRemove={handleRemoveColor}
+                                        />
+                                      ))
+                                    )}
+                                  </div>
+                                )}
                               </FavoriteDropContainer>
                             );
                           })}
@@ -407,6 +479,13 @@ export const FavoritesSidebar = ({
         onClose={() => setIsExportOpen(false)}
         title="Export Favorite Library"
         colors={exportColors}
+      />
+
+      <SavePaletteModal
+        isOpen={isSavePaletteOpen}
+        onClose={() => setIsSavePaletteOpen(false)}
+        onSave={handleSaveCurrentPalette}
+        colors={currentPaletteColors}
       />
     </>
   );

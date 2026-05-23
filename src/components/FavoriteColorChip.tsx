@@ -57,7 +57,7 @@ export const FavoriteColorChip = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-muted/20 flex items-center justify-between rounded-xl px-2 py-2"
+      className="flex items-center justify-between rounded-xl px-2 py-2"
     >
       <div className="flex items-center gap-2">
         <span

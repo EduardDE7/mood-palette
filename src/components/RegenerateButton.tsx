@@ -1,14 +1,19 @@
 "use client";
 
-import { useId } from "react";
-import { motion } from "framer-motion";
-import { Lock, RefreshCw } from "lucide-react";
+import { useEffect, useId } from "react";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
+import { ArrowLeft, ArrowRight, Lock, RefreshCw } from "lucide-react";
 
 import { Button } from "@/components/ui";
 import type { ColorItem } from "@/store/usePaletteStore";
 
 interface RegenerateButtonProps {
+  canGoBack: boolean;
+  canGoForward: boolean;
   colors: ColorItem[];
+  generationCount: number;
+  onBack: () => void;
+  onForward: () => void;
   onRegenerate: () => void;
 }
 
@@ -16,13 +21,18 @@ const formatColorCount = (count: number) =>
   `${count} color${count === 1 ? "" : "s"} will change`;
 
 export const RegenerateButton = ({
+  canGoBack,
+  canGoForward,
   colors,
+  generationCount,
+  onBack,
+  onForward,
   onRegenerate,
 }: RegenerateButtonProps) => {
   const helperTextId = useId();
+  const refreshIconControls = useAnimationControls();
   const unlockedColorsCount = colors.filter((color) => !color.isLocked).length;
   const canRegenerate = colors.length === 0 || unlockedColorsCount > 0;
-  const paletteSignature = colors.map((color) => color.hex).join("-");
 
   const title = canRegenerate
     ? "Press Space to regenerate palette"
@@ -35,19 +45,53 @@ export const RegenerateButton = ({
         ? formatColorCount(unlockedColorsCount)
         : "Unlock at least one color";
 
+  const rotateRefreshIcon = () => {
+    if (!canRegenerate) {
+      return;
+    }
+
+    refreshIconControls.start({
+      rotate: [0, 180, 360],
+      transition: { duration: 0.42, ease: "easeOut" },
+    });
+  };
+
+  useEffect(() => {
+    if (generationCount === 0) {
+      return;
+    }
+
+    rotateRefreshIcon();
+  }, [generationCount]);
+
   return (
     <div className="absolute bottom-6 left-1/2 z-30 -translate-x-1/2">
-      <motion.div
-        whileHover={canRegenerate ? { scale: 1.02 } : undefined}
-        whileTap={canRegenerate ? { scale: 0.98 } : undefined}
-        transition={{ type: "spring", stiffness: 360, damping: 22 }}
-        className="relative"
-      >
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-full shadow-[0_12px_30px_hsl(var(--primary)/0.28),0_0_65px_hsl(var(--accent)/0.24)]"
-        />
+      <AnimatePresence>
+        {canGoBack && (
+          <motion.div
+            key="palette-history-back"
+            initial={{ opacity: 0, scale: 0.82, x: 8 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.82, x: 8 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="absolute top-1/2 left-[-3rem] -translate-y-1/2 sm:left-[-3.5rem]"
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              round
+              onClick={onBack}
+              title="Go to previous generated palette"
+              aria-label="Go to previous generated palette"
+              className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+            >
+              <ArrowLeft size={18} />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
+      <div className="group relative">
         <Button
           variant="ghost"
           round
@@ -57,14 +101,12 @@ export const RegenerateButton = ({
           aria-label="Regenerate palette"
           aria-describedby={helperTextId}
           aria-keyshortcuts="Space"
-          className="relative flex h-auto min-w-[20rem] items-center justify-between gap-3 overflow-hidden border border-accent/70 bg-gradient-to-br from-background/95 to-accent/80 px-2 py-2 text-left text-foreground shadow-xl backdrop-blur-xl transition-colors hover:border-primary/65 hover:from-background/95 hover:to-accent/90 disabled:cursor-not-allowed"
+          className="glass-card relative flex h-auto min-w-[20rem] items-center justify-between gap-3 overflow-hidden bg-card/80 px-2 py-2 text-left text-foreground shadow-2xl hover:bg-card/90 disabled:cursor-not-allowed"
         >
           <span className="flex items-center gap-2">
             <motion.span
-              key={paletteSignature}
-              animate={canRegenerate ? { rotate: [0, 180] } : { rotate: 0 }}
-              transition={{ duration: 0.45, ease: "anticipate" }}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/65"
+              animate={refreshIconControls}
+              className="inline-flex h-8 w-8 items-center justify-center"
             >
               {canRegenerate ? (
                 <RefreshCw size={18} strokeWidth={2.5} />
@@ -90,7 +132,32 @@ export const RegenerateButton = ({
             Press Space
           </span>
         </Button>
-      </motion.div>
+      </div>
+
+      <AnimatePresence>
+        {canGoForward && (
+          <motion.div
+            key="palette-history-forward"
+            initial={{ opacity: 0, scale: 0.82, x: -8 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.82, x: -8 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="absolute top-1/2 right-[-3rem] -translate-y-1/2 sm:right-[-3.5rem]"
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              round
+              onClick={onForward}
+              title="Go to next generated palette"
+              aria-label="Go to next generated palette"
+              className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+            >
+              <ArrowRight size={18} />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

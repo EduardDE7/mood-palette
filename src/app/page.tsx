@@ -24,8 +24,17 @@ const STAGGER_TRANSITION = {
 
 export default function Home() {
   const colors = usePaletteStore((s) => s.colors);
+  const generationCount = usePaletteStore((s) => s.generationCount);
   const generatePalette = usePaletteStore((s) => s.generatePalette);
   const syncWithUrl = usePaletteStore((s) => s.syncWithUrl);
+  const paletteHistoryIndex = usePaletteStore((s) => s.paletteHistoryIndex);
+  const paletteHistoryLength = usePaletteStore((s) => s.paletteHistory.length);
+  const goBackInPaletteHistory = usePaletteStore(
+    (s) => s.goBackInPaletteHistory
+  );
+  const goForwardInPaletteHistory = usePaletteStore(
+    (s) => s.goForwardInPaletteHistory
+  );
 
   const colorIds = useMemo(() => colors.map((color) => color.id), [colors]);
   const { activeId, handleDragEnd, handleDragStart, sensors } =
@@ -76,7 +85,18 @@ export default function Home() {
         </DndContext>
       </motion.main>
 
-      <RegenerateButton colors={colors} onRegenerate={generatePalette} />
+      <RegenerateButton
+        colors={colors}
+        generationCount={generationCount}
+        canGoBack={paletteHistoryIndex > 0}
+        canGoForward={
+          paletteHistoryIndex >= 0 &&
+          paletteHistoryIndex < paletteHistoryLength - 1
+        }
+        onBack={goBackInPaletteHistory}
+        onForward={goForwardInPaletteHistory}
+        onRegenerate={generatePalette}
+      />
 
       <FavoritesSidebar
         isOpen={isFavoritesOpen}

@@ -82,7 +82,7 @@ export const SaveFavoriteColorModal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="bg-background/80 fixed inset-0 z-[70] grid place-items-center p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[70] grid place-items-center bg-black/20 p-4 backdrop-blur-sm"
         >
           <motion.div
             ref={dialogRef}
@@ -126,7 +126,7 @@ export const SaveFavoriteColorModal = ({
               id={selectId}
               value={selectedDestination}
               onChange={(event) => setSelectedDestination(event.target.value)}
-              className="bg-card text-foreground border-border focus:ring-ring mb-4 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2"
+              className="bg-white/5 text-foreground border-border focus:border-accent/80 focus:ring-accent/60 mb-4 w-full rounded-xl border px-3 py-2 backdrop-blur-sm outline-none focus:ring-2"
             >
               <option value="default">Default palette</option>
               {palettes.map((palette) => (
@@ -140,6 +140,7 @@ export const SaveFavoriteColorModal = ({
               <Button
                 variant="outline"
                 size="sm"
+                round
                 onClick={handleCreatePalette}
                 title="Create new favorite palette"
                 aria-label="Create new favorite palette"
@@ -153,6 +154,7 @@ export const SaveFavoriteColorModal = ({
               <Button
                 variant="ghost"
                 size="sm"
+                round
                 onClick={onClose}
                 title="Cancel saving color"
                 aria-label="Cancel saving color"
@@ -162,6 +164,7 @@ export const SaveFavoriteColorModal = ({
               <Button
                 variant="default"
                 size="sm"
+                round
                 onClick={handleSave}
                 title="Save color to selected destination"
                 aria-label="Save color to selected destination"

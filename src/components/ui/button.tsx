@@ -65,9 +65,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           round ? "rounded-full" : "rounded-md",
           variants[variant],
           sizes[size],
-          variant === "ghost" && size === "icon"
-            ? "border border-transparent bg-transparent text-current shadow-none backdrop-blur-none hover:border-white/35 hover:bg-white/10 hover:shadow-none active:scale-105"
-            : "",
           className
         )}
         ref={ref}

@@ -191,6 +191,7 @@ export const ColorColumn = ({
               size="icon"
               round
               onClick={() => removeColor(id)}
+              style={{ color: contrastColor }}
               title="Remove color"
               aria-label="Remove color"
               className="h-9 w-9"
@@ -203,7 +204,7 @@ export const ColorColumn = ({
         {isEditing ? (
           <input
             autoFocus
-            className="w-24 border-none bg-transparent text-center text-2xl font-bold tracking-wider uppercase outline-none"
+            className="w-36 max-w-[80%] border-none bg-transparent text-center text-2xl font-bold tracking-wider uppercase outline-none"
             value={editValue.replace("#", "")}
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleHexSubmit}
@@ -215,7 +216,7 @@ export const ColorColumn = ({
           />
         ) : (
           <h2
-            className="cursor-pointer text-2xl font-bold tracking-wider uppercase transition-transform select-none hover:scale-110"
+            className="cursor-pointer text-2xl font-bold tracking-wider uppercase select-none"
             onClick={startEditing}
             onContextMenu={(e) => {
               e.preventDefault();

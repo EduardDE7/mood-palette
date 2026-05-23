@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, Heart, Download, Save } from "lucide-react";
-import { BrandLogo, Button, ExportModal } from "@/components";
+import { BrandLogo, Button, ExportModal, SavePaletteModal } from "@/components";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
 interface HeaderProps {
@@ -10,11 +10,18 @@ interface HeaderProps {
 export const Header = ({ onOpenFavorites }: HeaderProps) => {
   const addColor = usePaletteStore((state) => state.addColor);
   const colors = usePaletteStore((state) => state.colors);
-  const saveCurrentPaletteToFavorites = usePaletteStore(
-    (state) => state.saveCurrentPaletteToFavorites
+  const savePaletteToFavorites = usePaletteStore(
+    (state) => state.savePaletteToFavorites
   );
 
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isSavePaletteOpen, setIsSavePaletteOpen] = useState(false);
+
+  const currentPaletteColors = colors.map((color) => color.hex);
+
+  const handleSavePalette = (name: string, paletteColors: string[]) => {
+    savePaletteToFavorites(name, paletteColors);
+  };
 
   return (
     <header className="glass-card fixed top-6 left-1/2 z-50 flex h-14 w-[95%] max-w-5xl -translate-x-1/2 items-center rounded-full px-2 shadow-2xl sm:w-[90%] sm:px-3">
@@ -27,7 +34,7 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
           variant="ghost"
           size="sm"
           round
-          onClick={saveCurrentPaletteToFavorites}
+          onClick={() => setIsSavePaletteOpen(true)}
           title="Save current palette to favorites"
           aria-label="Save current palette to favorites"
         >
@@ -59,15 +66,9 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
           onClick={addColor}
           title="Add a new color"
           aria-label="Add a new color"
-          className="palettrix-add-color-button border-none"
         >
-          <span className="palettrix-add-color-button__content">
-            <Plus size={16} />
-            <span>Add Color</span>
-          </span>
-          <span className="palettrix-add-color-button__layer palettrix-add-color-button__layer--one" />
-          <span className="palettrix-add-color-button__layer palettrix-add-color-button__layer--two" />
-          <span className="palettrix-add-color-button__layer palettrix-add-color-button__layer--three" />
+          <Plus size={16} />
+          Add Color
         </Button>
       </div>
 
@@ -75,7 +76,14 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
         isOpen={isExportOpen}
         onClose={() => setIsExportOpen(false)}
         title="Export Palette"
-        colors={colors.map((c) => c.hex)}
+        colors={currentPaletteColors}
+      />
+
+      <SavePaletteModal
+        isOpen={isSavePaletteOpen}
+        onClose={() => setIsSavePaletteOpen(false)}
+        onSave={handleSavePalette}
+        colors={currentPaletteColors}
       />
     </header>
   );

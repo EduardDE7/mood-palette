@@ -15,15 +15,24 @@ export interface FavoritePalette {
   createdAt: string;
 }
 
+type PaletteHistorySnapshot = ColorItem[];
+
 export type FavoriteLocation =
   | { type: "default" }
   | { type: "palette"; paletteId: string };
 
 interface PaletteState {
   colors: ColorItem[];
+  generationCount: number;
+  paletteHistory: PaletteHistorySnapshot[];
+  paletteHistoryIndex: number;
   favorites: string[];
   favoritePalettes: FavoritePalette[];
   generatePalette: () => void;
+  canGoBackInPaletteHistory: () => boolean;
+  canGoForwardInPaletteHistory: () => boolean;
+  goBackInPaletteHistory: () => void;
+  goForwardInPaletteHistory: () => void;
   reorderColors: (activeId: string, overId: string) => void;
   toggleLock: (id: string) => void;
   updateColor: (id: string, hex: string) => void;
@@ -37,6 +46,10 @@ interface PaletteState {
   createFavoritePalette: (name?: string) => FavoritePalette;
   renameFavoritePalette: (paletteId: string, name: string) => void;
   removeFavoritePalette: (paletteId: string) => void;
+  savePaletteToFavorites: (
+    name: string,
+    colors: string[]
+  ) => FavoritePalette | null;
   saveCurrentPaletteToFavorites: () => FavoritePalette | null;
   applyFavoritePalette: (paletteId: string) => void;
   moveFavoriteColor: (
@@ -51,6 +64,50 @@ const DEFAULT_PALETTE_PREFIX = "Palette";
 const normalizeHex = (hex: string) => {
   const trimmedHex = hex.trim().toUpperCase();
   return trimmedHex.startsWith("#") ? trimmedHex : `#${trimmedHex}`;
+};
+
+const cloneColors = (colors: ColorItem[]) =>
+  colors.map((color) => ({ ...color }));
+
+const areColorSnapshotsEqual = (
+  firstColors: ColorItem[],
+  secondColors: ColorItem[]
+) => {
+  if (firstColors.length !== secondColors.length) {
+    return false;
+  }
+
+  return firstColors.every((color, colorIndex) => {
+    const otherColor = secondColors[colorIndex];
+    return (
+      color.id === otherColor.id &&
+      color.hex === otherColor.hex &&
+      color.isLocked === otherColor.isLocked
+    );
+  });
+};
+
+const getHistoryWithCurrentColors = (state: PaletteState) => {
+  const currentSnapshot = cloneColors(state.colors);
+
+  if (currentSnapshot.length === 0) {
+    return [];
+  }
+
+  if (state.paletteHistory.length === 0 || state.paletteHistoryIndex < 0) {
+    return [currentSnapshot];
+  }
+
+  const history = state.paletteHistory
+    .slice(0, state.paletteHistoryIndex + 1)
+    .map(cloneColors);
+  const currentHistorySnapshot = history[history.length - 1];
+
+  if (!areColorSnapshotsEqual(currentHistorySnapshot, state.colors)) {
+    history[history.length - 1] = currentSnapshot;
+  }
+
+  return history;
 };
 
 const isSameLocation = (source: FavoriteLocation, target: FavoriteLocation) => {
@@ -156,6 +213,9 @@ export const usePaletteStore = create<PaletteState>()(
   persist(
     (set, get) => ({
       colors: [],
+      generationCount: 0,
+      paletteHistory: [],
+      paletteHistoryIndex: -1,
       favorites: [],
       favoritePalettes: [],
 
@@ -177,7 +237,11 @@ export const usePaletteStore = create<PaletteState>()(
           }));
 
         if (newColors.length > 0) {
-          set({ colors: newColors });
+          set({
+            colors: newColors,
+            paletteHistory: [cloneColors(newColors)],
+            paletteHistoryIndex: 0,
+          });
         } else {
           get().generatePalette();
         }
@@ -199,8 +263,72 @@ export const usePaletteStore = create<PaletteState>()(
           );
         }
 
-        set({ colors: newColors });
+        set((state) => {
+          if (state.colors.length === 0) {
+            return {
+              colors: newColors,
+              paletteHistory: [cloneColors(newColors)],
+              paletteHistoryIndex: 0,
+            };
+          }
+
+          const nextHistory = [...getHistoryWithCurrentColors(state), newColors];
+
+          return {
+            colors: newColors,
+            generationCount: state.generationCount + 1,
+            paletteHistory: nextHistory.map(cloneColors),
+            paletteHistoryIndex: nextHistory.length - 1,
+          };
+        });
         updateUrlHash(newColors);
+      },
+
+      canGoBackInPaletteHistory: () => get().paletteHistoryIndex > 0,
+
+      canGoForwardInPaletteHistory: () => {
+        const { paletteHistory, paletteHistoryIndex } = get();
+        return (
+          paletteHistoryIndex >= 0 &&
+          paletteHistoryIndex < paletteHistory.length - 1
+        );
+      },
+
+      goBackInPaletteHistory: () => {
+        set((state) => {
+          if (state.paletteHistoryIndex <= 0) {
+            return state;
+          }
+
+          const nextIndex = state.paletteHistoryIndex - 1;
+          const nextColors = cloneColors(state.paletteHistory[nextIndex]);
+          updateUrlHash(nextColors);
+
+          return {
+            colors: nextColors,
+            paletteHistoryIndex: nextIndex,
+          };
+        });
+      },
+
+      goForwardInPaletteHistory: () => {
+        set((state) => {
+          if (
+            state.paletteHistoryIndex < 0 ||
+            state.paletteHistoryIndex >= state.paletteHistory.length - 1
+          ) {
+            return state;
+          }
+
+          const nextIndex = state.paletteHistoryIndex + 1;
+          const nextColors = cloneColors(state.paletteHistory[nextIndex]);
+          updateUrlHash(nextColors);
+
+          return {
+            colors: nextColors,
+            paletteHistoryIndex: nextIndex,
+          };
+        });
       },
 
       reorderColors: (activeId: string, overId: string) => {
@@ -424,6 +552,26 @@ export const usePaletteStore = create<PaletteState>()(
             favoritePalettes: nextPalettes,
           };
         });
+      },
+
+      savePaletteToFavorites: (name: string, colors: string[]) => {
+        const paletteColors = colors.map(normalizeHex);
+
+        if (paletteColors.length === 0) {
+          return null;
+        }
+
+        const createdPalette = createFavoritePaletteRecord(
+          get().favoritePalettes,
+          name,
+          paletteColors
+        );
+
+        set((state) => ({
+          favoritePalettes: [createdPalette, ...state.favoritePalettes],
+        }));
+
+        return createdPalette;
       },
 
       saveCurrentPaletteToFavorites: () => {
