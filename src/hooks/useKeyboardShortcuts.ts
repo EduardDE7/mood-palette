@@ -29,7 +29,13 @@ const blurButtonFromTarget = (target: EventTarget | null) => {
   getButtonFromTarget(target)?.blur();
 };
 
-export const useKeyboardShortcuts = () => {
+interface UseKeyboardShortcutsOptions {
+  onSpaceGenerate?: () => void;
+}
+
+export const useKeyboardShortcuts = ({
+  onSpaceGenerate,
+}: UseKeyboardShortcutsOptions = {}) => {
   const generatePalette = usePaletteStore((s) => s.generatePalette);
   const canRegenerate = usePaletteStore(
     (s) => s.colors.length === 0 || s.colors.some((color) => !color.isLocked)
@@ -88,6 +94,7 @@ export const useKeyboardShortcuts = () => {
 
       if (canRegenerate) {
         generatePalette();
+        onSpaceGenerate?.();
       }
     };
 
@@ -100,6 +107,7 @@ export const useKeyboardShortcuts = () => {
     generatePalette,
     goBackInPaletteHistory,
     goForwardInPaletteHistory,
+    onSpaceGenerate,
   ]);
 
   useEffect(() => {

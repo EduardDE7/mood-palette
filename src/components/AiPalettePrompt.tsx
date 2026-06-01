@@ -26,7 +26,7 @@ export const AiPalettePrompt = ({ onClose }: AiPalettePromptProps) => {
     <div className="relative w-[min(42rem,calc(100vw-1.5rem))]">
       <div className="ai-glow relative rounded-[1.5rem]">
         <form
-          className="glass-card bg-card/90 relative rounded-[1.5rem]"
+          className="border-border relative rounded-[1.5rem] border bg-[#1C221D]"
           onSubmit={(event) => {
             event.preventDefault();
             void generatePalette();
@@ -58,7 +58,7 @@ export const AiPalettePrompt = ({ onClose }: AiPalettePromptProps) => {
             autoComplete="off"
             spellCheck={false}
             rows={3}
-            placeholder="Dream in colors..."
+            placeholder="Generate with AI"
             aria-describedby={helperTextId}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {

@@ -193,7 +193,7 @@ export const ColorColumn = ({
             round
             title="Drag to reorder color"
             aria-label="Drag to reorder color"
-            className="h-9 w-9 cursor-grab opacity-0 transition-opacity duration-300 group-hover:opacity-100 active:cursor-grabbing"
+            className="h-9 w-9 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             style={{ touchAction: "none", color: contrastColor }}
           >
             <GripVertical size={18} />
@@ -207,7 +207,7 @@ export const ColorColumn = ({
             style={{ color: contrastColor }}
             title={isLocked ? "Unlock" : "Lock"}
             aria-label={isLocked ? "Unlock color" : "Lock color"}
-            className="h-9 w-9 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            className="h-9 w-9 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           >
             {isLocked ? (
               <Lock size={18} className="[&>rect]:fill-current" />
@@ -230,7 +230,7 @@ export const ColorColumn = ({
                 ? "Remove color from favorites"
                 : "Save color to favorites"
             }
-            className="h-9 w-9 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            className="h-9 w-9 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           >
             <Heart size={18} fill={isFavorite ? contrastColor : "none"} />
           </Button>
@@ -243,7 +243,7 @@ export const ColorColumn = ({
             style={{ color: contrastColor }}
             title="View color shades"
             aria-label="View color shades"
-            className="h-9 w-9 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            className="h-9 w-9 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           >
             <Palette size={18} />
           </Button>
@@ -261,7 +261,7 @@ export const ColorColumn = ({
                 : "Duplicate color column"
             }
             aria-label="Duplicate color column"
-            className="h-9 w-9 opacity-0 transition-opacity duration-300 group-hover:opacity-100 disabled:pointer-events-none disabled:opacity-30"
+            className="h-9 w-9 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100 disabled:pointer-events-none disabled:opacity-30"
           >
             <Copy size={18} />
           </Button>
@@ -275,7 +275,7 @@ export const ColorColumn = ({
               style={{ color: contrastColor }}
               title="Remove color"
               aria-label="Remove color"
-              className="h-9 w-9 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              className="h-9 w-9 cursor-pointer opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             >
               <Trash2 size={18} />
             </Button>
@@ -320,7 +320,7 @@ export const ColorColumn = ({
                 style={{ color: contrastColor }}
                 title="Copy HEX"
                 aria-label="Copy color HEX value"
-                className="h-6 w-6 opacity-60 transition-opacity hover:opacity-100"
+                className="h-6 w-6 cursor-pointer opacity-60 transition-opacity hover:opacity-100"
               >
                 <Copy size={12} />
               </Button>

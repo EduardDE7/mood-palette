@@ -106,6 +106,7 @@ export const useAiPaletteGeneration = () => {
       }
 
       applyGeneratedPalette(nextColors);
+      setPrompt("");
     } catch (caughtError) {
       const message =
         caughtError instanceof Error

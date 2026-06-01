@@ -31,7 +31,7 @@ export const SortableColorColumn = ({
       transform: CSS.Transform.toString(transform),
       transition: isDragging ? undefined : transition,
       zIndex: isDragging ? 30 : "auto",
-      cursor: isDragging ? "grabbing" : "grab",
+      cursor: "default",
     }),
     [isDragging, transform, transition]
   );

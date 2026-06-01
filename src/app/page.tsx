@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { usePaletteStore } from "@/store/usePaletteStore";
 import {
@@ -41,8 +41,21 @@ export default function Home() {
     usePaletteDnd(colorIds);
 
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [showSpaceIndicator, setShowSpaceIndicator] = useState(false);
+  const spaceIndicatorTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
-  useKeyboardShortcuts();
+  const handleSpaceGenerate = useCallback(() => {
+    if (spaceIndicatorTimer.current) clearTimeout(spaceIndicatorTimer.current);
+    setShowSpaceIndicator(true);
+    spaceIndicatorTimer.current = setTimeout(
+      () => setShowSpaceIndicator(false),
+      1200
+    );
+  }, []);
+
+  useKeyboardShortcuts({ onSpaceGenerate: handleSpaceGenerate });
 
   useEffect(() => {
     syncWithUrl();
@@ -102,6 +115,20 @@ export default function Home() {
         isOpen={isFavoritesOpen}
         onClose={() => setIsFavoritesOpen(false)}
       />
+
+      <AnimatePresence>
+        {showSpaceIndicator && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.8 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="pointer-events-none fixed right-8 bottom-8 z-50 rounded-full border border-white/10 bg-black/80 px-4 py-2 text-sm font-medium tracking-wide text-white/80 shadow-2xl backdrop-blur-sm"
+          >
+            ␣ pressed
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_150px_rgba(0,0,0,0.05)]" />
     </div>
