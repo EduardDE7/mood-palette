@@ -11,6 +11,25 @@ export const generateRandomHex = (): string => {
 };
 
 /**
+ * Normalizes a hex color string to uppercase #RRGGBB format.
+ */
+export const normalizeHex = (hex: string): string => {
+  const trimmedHex = hex.trim().toUpperCase();
+
+  if (trimmedHex.startsWith("#")) {
+    return trimmedHex;
+  }
+
+  return `#${trimmedHex}`;
+};
+
+/**
+ * Checks whether a string is a valid 3- or 6-digit hex color.
+ */
+export const isValidHexColor = (hex: string): boolean =>
+  /^(#?[0-9A-F]{3}|#?[0-9A-F]{6})$/i.test(hex.trim());
+
+/**
  * Calculates the relative luminance of a color to determine if text should be black or white.
  * Based on YIQ brightness formula.
  */

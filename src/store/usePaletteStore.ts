@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { generateRandomHex, moveItemById } from "@/utils";
+import { generateRandomHex, moveItemById, normalizeHex } from "@/utils";
 
 export interface ColorItem {
   id: string;
@@ -40,6 +40,7 @@ interface PaletteState {
   duplicateColor: (id: string) => void;
   addColor: () => void;
   syncWithUrl: () => void;
+  applyGeneratedPalette: (hexes: string[]) => void;
   addFavorite: (hex: string, paletteId?: string) => void;
   removeFavorite: (hex: string) => void;
   removeFavoriteFromPalette: (paletteId: string, hex: string) => void;
@@ -61,11 +62,6 @@ interface PaletteState {
 }
 
 const DEFAULT_PALETTE_PREFIX = "Palette";
-
-const normalizeHex = (hex: string) => {
-  const trimmedHex = hex.trim().toUpperCase();
-  return trimmedHex.startsWith("#") ? trimmedHex : `#${trimmedHex}`;
-};
 
 const cloneColors = (colors: ColorItem[]) =>
   colors.map((color) => ({ ...color }));
@@ -400,6 +396,45 @@ export const usePaletteStore = create<PaletteState>()(
             },
           ];
           return commitColors(state, newColors);
+        });
+      },
+
+      applyGeneratedPalette: (hexes: string[]) => {
+        set((state) => {
+          if (hexes.length === 0) {
+            return state;
+          }
+
+          const highestLockedIndex = state.colors.reduce(
+            (highestIndex, color, colorIndex) =>
+              color.isLocked ? Math.max(highestIndex, colorIndex) : highestIndex,
+            -1
+          );
+          const nextColorCount = Math.min(
+            8,
+            Math.max(2, hexes.length, highestLockedIndex + 1)
+          );
+          const nextColors = Array.from({ length: nextColorCount }).map(
+            (_, colorIndex) => {
+              const currentColor = state.colors[colorIndex];
+
+              if (currentColor?.isLocked) {
+                return currentColor;
+              }
+
+              return {
+                id: currentColor?.id ?? crypto.randomUUID(),
+                hex: normalizeHex(
+                  hexes[colorIndex] ?? currentColor?.hex ?? generateRandomHex()
+                ),
+                isLocked: false,
+              };
+            }
+          );
+
+          return commitColors(state, nextColors, {
+            generationCount: state.generationCount + 1,
+          });
         });
       },
 

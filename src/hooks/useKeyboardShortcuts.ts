@@ -34,17 +34,50 @@ export const useKeyboardShortcuts = () => {
   const canRegenerate = usePaletteStore(
     (s) => s.colors.length === 0 || s.colors.some((color) => !color.isLocked)
   );
+  const goBackInPaletteHistory = usePaletteStore(
+    (s) => s.goBackInPaletteHistory
+  );
+  const goForwardInPaletteHistory = usePaletteStore(
+    (s) => s.goForwardInPaletteHistory
+  );
+  const paletteHistoryIndex = usePaletteStore((s) => s.paletteHistoryIndex);
+  const paletteHistoryLength = usePaletteStore((s) => s.paletteHistory.length);
+
+  const canGoBack = paletteHistoryIndex > 0;
+  const canGoForward =
+    paletteHistoryIndex >= 0 && paletteHistoryIndex < paletteHistoryLength - 1;
 
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || e.code !== "Space") {
-        return;
-      }
-
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (
+        e.defaultPrevented ||
         document.querySelector(MODAL_DIALOG_SELECTOR) ||
         shouldIgnoreShortcutTarget(e.target)
       ) {
+        return;
+      }
+
+      const isMod = e.metaKey || e.ctrlKey;
+
+      if (isMod && e.key === "z") {
+        e.preventDefault();
+        blurButtonFromTarget(e.target);
+        if (canGoBack) {
+          goBackInPaletteHistory();
+        }
+        return;
+      }
+
+      if (isMod && e.key === "Z") {
+        e.preventDefault();
+        blurButtonFromTarget(e.target);
+        if (canGoForward) {
+          goForwardInPaletteHistory();
+        }
+        return;
+      }
+
+      if (e.code !== "Space") {
         return;
       }
 
@@ -58,9 +91,16 @@ export const useKeyboardShortcuts = () => {
       }
     };
 
-    window.addEventListener("keydown", handleKeyPress, true);
-    return () => window.removeEventListener("keydown", handleKeyPress, true);
-  }, [canRegenerate, generatePalette]);
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [
+    canGoBack,
+    canGoForward,
+    canRegenerate,
+    generatePalette,
+    goBackInPaletteHistory,
+    goForwardInPaletteHistory,
+  ]);
 
   useEffect(() => {
     let pressedButton: HTMLButtonElement | null = null;

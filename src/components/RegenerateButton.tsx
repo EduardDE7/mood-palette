@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useId } from "react";
+import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
-import { ArrowLeft, ArrowRight, Lock, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, RefreshCw, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui";
 import type { ColorItem } from "@/store/usePaletteStore";
+
+import { AiPalettePrompt } from "./AiPalettePrompt";
 
 interface RegenerateButtonProps {
   canGoBack: boolean;
@@ -31,6 +33,7 @@ export const RegenerateButton = ({
 }: RegenerateButtonProps) => {
   const helperTextId = useId();
   const refreshIconControls = useAnimationControls();
+  const [isAiPromptOpen, setIsAiPromptOpen] = useState(false);
   const unlockedColorsCount = colors.filter((color) => !color.isLocked).length;
   const canRegenerate = colors.length === 0 || unlockedColorsCount > 0;
 
@@ -65,33 +68,72 @@ export const RegenerateButton = ({
   }, [generationCount]);
 
   return (
-    <div className="absolute bottom-6 left-1/2 z-30 -translate-x-1/2">
+    <div className="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-4">
       <AnimatePresence>
-        {canGoBack && (
+        {isAiPromptOpen && (
           <motion.div
-            key="palette-history-back"
-            initial={{ opacity: 0, scale: 0.82, x: 8 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.82, x: 8 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="absolute top-1/2 left-[-3rem] -translate-y-1/2 sm:left-[-3.5rem]"
+            key="ai-palette-prompt"
+            initial={{ opacity: 0, y: 18, scale: 0.96, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: 14, scale: 0.97, filter: "blur(8px)" }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
           >
-            <Button
-              variant="ghost"
-              size="icon"
-              round
-              onClick={onBack}
-              title="Go to previous generated palette"
-              aria-label="Go to previous generated palette"
-              className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
-            >
-              <ArrowLeft size={18} />
-            </Button>
+            <AiPalettePrompt onClose={() => setIsAiPromptOpen(false)} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="group relative">
+      <div className="flex items-center justify-center gap-3">
+        <div className="flex h-12 w-[5.5rem] items-center justify-end gap-2">
+          <AnimatePresence>
+            {canGoBack && (
+              <motion.div
+                key="palette-history-back"
+                initial={{ opacity: 0, scale: 0.82, x: 8 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.82, x: 8 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  round
+                  onClick={onBack}
+                  title="Go to previous generated palette"
+                  aria-label="Go to previous generated palette"
+                  className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+                >
+                  <ArrowLeft size={18} />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {canGoForward && (
+              <motion.div
+                key="palette-history-forward"
+                initial={{ opacity: 0, scale: 0.82, x: -8 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.82, x: -8 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  round
+                  onClick={onForward}
+                  title="Go to next generated palette"
+                  aria-label="Go to next generated palette"
+                  className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+                >
+                  <ArrowRight size={18} />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <Button
           variant="ghost"
           round
@@ -132,32 +174,24 @@ export const RegenerateButton = ({
             Press Space
           </span>
         </Button>
-      </div>
 
-      <AnimatePresence>
-        {canGoForward && (
-          <motion.div
-            key="palette-history-forward"
-            initial={{ opacity: 0, scale: 0.82, x: -8 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.82, x: -8 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="absolute top-1/2 right-[-3rem] -translate-y-1/2 sm:right-[-3.5rem]"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              round
-              onClick={onForward}
-              title="Go to next generated palette"
-              aria-label="Go to next generated palette"
-              className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
-            >
-              <ArrowRight size={18} />
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <Button
+          variant="ghost"
+          size="icon"
+          round
+          onClick={() => setIsAiPromptOpen((isOpen) => !isOpen)}
+          title={
+            isAiPromptOpen ? "Close AI palette prompt" : "Open AI palette prompt"
+          }
+          aria-label={
+            isAiPromptOpen ? "Close AI palette prompt" : "Open AI palette prompt"
+          }
+          aria-expanded={isAiPromptOpen}
+          className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+        >
+          <Sparkles size={18} strokeWidth={2.4} />
+        </Button>
+      </div>
     </div>
   );
 };

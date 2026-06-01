@@ -65,6 +65,51 @@
   border: 1px solid hsl(var(--border) / 1);
 }
 
+@property --glow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@utility ai-glow {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    pointer-events: none;
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--glow-angle),
+      transparent 0%,
+      hsl(var(--primary)) 20%,
+      hsl(var(--accent)) 50%,
+      hsl(var(--primary)) 80%,
+      transparent 100%
+    );
+    animation: glow-spin 8s linear infinite;
+    filter: blur(2px);
+    opacity: 0.45;
+    transition:
+      opacity 400ms ease,
+      filter 400ms ease;
+  }
+
+  &:focus-within::before {
+    opacity: 0.95;
+    filter: blur(8px);
+  }
+}
+
+@keyframes glow-spin {
+  to {
+    --glow-angle: 360deg;
+  }
+}
+
 .palettrix-logo {
   transition: transform 220ms ease;
   transform-origin: center;

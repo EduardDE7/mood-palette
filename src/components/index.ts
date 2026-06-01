@@ -9,4 +9,5 @@ export * from "./FavoriteDropContainer";
 export * from "./FavoritesSidebar";
 export * from "./ExportModal";
 export * from "./RegenerateButton";
+export * from "./AiPalettePrompt";
 export * from "./ui";

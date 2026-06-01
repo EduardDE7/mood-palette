@@ -45,7 +45,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 400,
       damping: 30,
     },
@@ -365,17 +365,24 @@ export const ColorColumn = ({
                       updateColor(id, shade);
                       setShowShades(false);
                     }}
-                    className="group/shade relative flex flex-1 w-full items-center justify-center border-none outline-none transition-[flex] duration-[600ms] ease-[cubic-bezier(0.19,1,0.22,1)] hover:flex-[3] hover:shadow-lg active:scale-98 cursor-pointer focus-visible:z-40 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
+                    className="group/shade relative flex w-full flex-1 cursor-pointer items-center justify-center border-none transition-[flex] duration-[600ms] ease-[cubic-bezier(0.19,1,0.22,1)] outline-none hover:flex-[3] hover:shadow-lg focus-visible:z-40 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset active:scale-98"
                     title={`Apply shade ${shade}`}
                     aria-label={`Apply shade ${shade}`}
                   >
                     <div className="pointer-events-none flex items-center gap-1.5 select-none">
                       {isCurrent && (
-                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: shadeContrast }} />
+                        <span
+                          className="h-1.5 w-1.5 rounded-full"
+                          style={{ backgroundColor: shadeContrast }}
+                        />
                       )}
-                      <span className={`font-mono text-[10px] md:text-xs font-bold tracking-wide uppercase transition-all duration-200 ${
-                        isCurrent ? "opacity-100 scale-105" : "opacity-0 group-hover/shade:opacity-100 group-focus-visible/shade:opacity-100"
-                      }`}>
+                      <span
+                        className={`font-mono text-[10px] font-bold tracking-wide uppercase transition-all duration-200 md:text-xs ${
+                          isCurrent
+                            ? "scale-105 opacity-100"
+                            : "opacity-0 group-hover/shade:opacity-100 group-focus-visible/shade:opacity-100"
+                        }`}
+                      >
                         {shade.replace("#", "")}
                       </span>
                     </div>
