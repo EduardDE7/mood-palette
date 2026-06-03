@@ -1,0 +1,56 @@
+# Progress Tracker
+
+Update this file after every meaningful implementation change.
+
+## Current Phase
+
+- Complete — Core application is fully functional
+
+## Current Goal
+
+- Maintain and extend existing features; context files now adapted for AI workflow
+
+## Completed
+
+- Core palette editor (generate, lock, edit, reorder, undo/redo)
+- Color shades viewer (21 shades per color)
+- Favorites system with named palettes (localStorage persistence)
+- Favorites DnD between palettes
+- AI palette generation via Groq API
+- Export to CSS, Tailwind, and JSON formats
+- Shareable URLs via hash routing
+- Glass-morphism dark UI with animations
+- Accessibility (keyboard shortcuts, focus trapping, aria attributes)
+- Custom Button component with 9 variants
+- Brand logo with animated gradient SVG
+- Modals: ExportModal, SavePaletteModal, SaveFavoriteColorModal
+- FavoritesSidebar with inline rename and expand/collapse
+
+## In Progress
+
+- None currently
+
+## Next Up
+
+- [Future features to be defined — auth system, database persistence, image-based palette extraction]
+
+## Open Questions
+
+- Should the auth system use Clerk, NextAuth, or a custom solution?
+- Should favorites be synced to a backend database?
+- Should there be a public gallery for sharing palettes?
+- Should the app support image-based palette extraction?
+
+## Architecture Decisions
+
+- **Single Zustand store** over multiple stores: the app state is tightly coupled (palette, history, favorites), one store keeps it simple
+- **localStorage persistence only**: no backend yet — favorites survive page reloads via Zustand persist middleware
+- **Groq API for AI generation**: chosen for speed and low cost over OpenAI or Anthropic
+- **No shadcn CLI**: custom Button component built manually for specific variant needs
+- **URL hash for sharing**: lightweight, no server needed, palette instantly restorable
+
+## Session Notes
+
+- Context files (`context/`) have been adapted to the actual Palettrix project as of June 2026
+- Placeholder directories exist for future auth and database features: `src/lib/auth/`, `src/app/api/auth/`, `db/migrations/`
+- `.env` contains `GROQ_API_KEY` — required for AI palette generation
