@@ -5,6 +5,7 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
   horizontalListSortingStrategy,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -15,7 +16,7 @@ import {
   FavoritesSidebar,
   RegenerateButton,
 } from "@/components";
-import { useKeyboardShortcuts, usePaletteDnd } from "@/hooks";
+import { useKeyboardShortcuts, useMediaQuery, usePaletteDnd } from "@/hooks";
 
 const STAGGER_TRANSITION = {
   staggerChildren: 0.05,
@@ -24,6 +25,7 @@ const STAGGER_TRANSITION = {
 
 export default function Home() {
   const colors = usePaletteStore((s) => s.colors);
+  const addColor = usePaletteStore((s) => s.addColor);
   const generationCount = usePaletteStore((s) => s.generationCount);
   const generatePalette = usePaletteStore((s) => s.generatePalette);
   const syncWithUrl = usePaletteStore((s) => s.syncWithUrl);
@@ -40,8 +42,19 @@ export default function Home() {
   const { activeId, handleDragEnd, handleDragStart, sensors } =
     usePaletteDnd(colorIds);
 
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const strategy = isMobile
+    ? verticalListSortingStrategy
+    : horizontalListSortingStrategy;
+
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [showSpaceIndicator, setShowSpaceIndicator] = useState(false);
+  const [mobileShadesColorId, setMobileShadesColorId] = useState<string | null>(
+    null
+  );
+  const paletteScrollContainerRef = useRef<HTMLElement | null>(null);
+  const shouldScrollToAddedColorRef = useRef(false);
+  const previousColorCountRef = useRef(colors.length);
   const spaceIndicatorTimer = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
@@ -61,11 +74,48 @@ export default function Home() {
     syncWithUrl();
   }, [syncWithUrl]);
 
+  useEffect(() => {
+    const previousColorCount = previousColorCountRef.current;
+    previousColorCountRef.current = colors.length;
+
+    if (
+      !isMobile ||
+      !shouldScrollToAddedColorRef.current ||
+      colors.length <= previousColorCount
+    ) {
+      shouldScrollToAddedColorRef.current = false;
+      return;
+    }
+
+    shouldScrollToAddedColorRef.current = false;
+
+    requestAnimationFrame(() => {
+      const scrollContainer = paletteScrollContainerRef.current;
+      if (!scrollContainer) {
+        return;
+      }
+
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: "smooth",
+      });
+    });
+  }, [colors.length, isMobile]);
+
+  const handleAddColor = useCallback(() => {
+    shouldScrollToAddedColorRef.current = true;
+    addColor();
+  }, [addColor]);
+
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden">
-      <Header onOpenFavorites={() => setIsFavoritesOpen(true)} />
+    <div className="relative flex h-screen min-h-screen h-dvh min-h-dvh flex-col overflow-hidden">
+      <Header
+        onAddColor={handleAddColor}
+        onOpenFavorites={() => setIsFavoritesOpen(true)}
+      />
 
       <motion.main
+        ref={paletteScrollContainerRef}
         initial="initial"
         animate="animate"
         aria-describedby="palette-dnd-instructions"
@@ -74,7 +124,7 @@ export default function Home() {
             transition: STAGGER_TRANSITION,
           },
         }}
-        className="flex flex-1 overflow-hidden"
+        className="flex flex-1 overflow-hidden max-md:min-h-0 max-md:flex-col max-md:overflow-y-auto"
       >
         <p id="palette-dnd-instructions" className="sr-only">
           Reorder colors with drag handles. Focus a handle, press Space to pick
@@ -87,12 +137,22 @@ export default function Home() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext
-            items={colorIds}
-            strategy={horizontalListSortingStrategy}
-          >
+          <SortableContext items={colorIds} strategy={strategy}>
             {colors.map((color) => (
-              <SortableColorColumn key={color.id} {...color} />
+              <SortableColorColumn
+                key={color.id}
+                {...color}
+                isMobileShadesOpen={mobileShadesColorId === color.id}
+                onOpenMobileShades={
+                  isMobile
+                    ? ({ id }) =>
+                        setMobileShadesColorId((currentId) =>
+                          currentId === id ? null : id
+                        )
+                    : undefined
+                }
+                onCloseMobileShades={() => setMobileShadesColorId(null)}
+              />
             ))}
           </SortableContext>
         </DndContext>

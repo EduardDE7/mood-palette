@@ -68,7 +68,7 @@ export const RegenerateButton = ({
   }, [generationCount]);
 
   return (
-    <div className="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-4">
+    <div className="border-border/80 bg-card/80 relative z-30 flex w-full flex-col items-center gap-3 border-t px-2 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-2xl backdrop-blur-2xl md:absolute md:bottom-6 md:left-1/2 md:w-auto md:-translate-x-1/2 md:gap-4 md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none">
       <AnimatePresence>
         {isAiPromptOpen && (
           <motion.div
@@ -83,8 +83,8 @@ export const RegenerateButton = ({
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-center gap-3">
-        <div className="flex h-12 w-[5.5rem] items-center justify-end gap-2">
+      <div className="flex w-full items-center justify-center gap-2 md:w-auto md:gap-3">
+        <div className="flex h-12 w-auto items-center justify-end gap-1 md:w-[5.5rem] md:gap-2">
           <AnimatePresence>
             {canGoBack && (
               <motion.div
@@ -101,7 +101,7 @@ export const RegenerateButton = ({
                   onClick={onBack}
                   title="Go to previous generated palette"
                   aria-label="Go to previous generated palette"
-                  className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+                  className="glass-card bg-card/80 hover:bg-card/90 h-10 w-10 shadow-2xl"
                 >
                   <ArrowLeft size={18} />
                 </Button>
@@ -125,7 +125,7 @@ export const RegenerateButton = ({
                   onClick={onForward}
                   title="Go to next generated palette"
                   aria-label="Go to next generated palette"
-                  className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+                  className="glass-card bg-card/80 hover:bg-card/90 h-10 w-10 shadow-2xl"
                 >
                   <ArrowRight size={18} />
                 </Button>
@@ -143,7 +143,7 @@ export const RegenerateButton = ({
           aria-label="Regenerate palette"
           aria-describedby={helperTextId}
           aria-keyshortcuts="Space"
-          className="glass-card relative flex h-auto min-w-[20rem] items-center justify-between gap-3 overflow-hidden bg-card/80 px-2 py-2 text-left text-foreground shadow-2xl hover:bg-card/90 disabled:cursor-not-allowed"
+          className="glass-card bg-card/80 text-foreground hover:bg-card/90 relative flex h-auto min-w-0 flex-1 items-center justify-between gap-3 overflow-hidden px-2 py-2 text-left shadow-2xl disabled:cursor-not-allowed max-md:rounded-none max-md:shadow-none md:min-w-[20rem] md:flex-none"
         >
           <span className="flex items-center gap-2">
             <motion.span
@@ -158,19 +158,19 @@ export const RegenerateButton = ({
             </motion.span>
 
             <span className="flex flex-col">
-              <span className="whitespace-nowrap text-sm font-semibold tracking-wide uppercase">
+              <span className="text-sm font-semibold tracking-wide whitespace-nowrap uppercase">
                 Regenerate
               </span>
               <span
                 id={helperTextId}
-                className="whitespace-nowrap text-xs font-normal text-muted-foreground"
+                className="text-muted-foreground text-xs font-normal whitespace-nowrap"
               >
                 {helperText}
               </span>
             </span>
           </span>
 
-          <span className="hidden h-9 items-center rounded-full border border-white/70 bg-white/95 px-3 text-xs font-medium leading-none tracking-normal text-slate-950 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-xl sm:inline-flex">
+          <span className="hidden h-9 items-center rounded-full border border-white/70 bg-white/95 px-3 text-xs leading-none font-medium tracking-normal text-slate-950 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-xl sm:inline-flex">
             Press Space
           </span>
         </Button>
@@ -181,13 +181,17 @@ export const RegenerateButton = ({
           round
           onClick={() => setIsAiPromptOpen((isOpen) => !isOpen)}
           title={
-            isAiPromptOpen ? "Close AI palette prompt" : "Open AI palette prompt"
+            isAiPromptOpen
+              ? "Close AI palette prompt"
+              : "Open AI palette prompt"
           }
           aria-label={
-            isAiPromptOpen ? "Close AI palette prompt" : "Open AI palette prompt"
+            isAiPromptOpen
+              ? "Close AI palette prompt"
+              : "Open AI palette prompt"
           }
           aria-expanded={isAiPromptOpen}
-          className="glass-card h-10 w-10 bg-card/80 shadow-2xl hover:bg-card/90"
+          className="glass-card bg-card/80 hover:bg-card/90 h-10 w-10 shadow-2xl"
         >
           <Sparkles size={18} strokeWidth={2.4} />
         </Button>

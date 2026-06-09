@@ -25,6 +25,32 @@ Update this file after every meaningful implementation change.
 - Brand logo with animated gradient SVG
 - Modals: ExportModal, SavePaletteModal, SaveFavoriteColorModal
 - FavoritesSidebar with inline rename and expand/collapse
+- Mobile responsiveness:
+  - Vertical stacking of color columns on mobile (< 768px)
+  - DnD strategy switches to vertical on mobile
+  - Mobile action bar: horizontal row of icon buttons at bottom of each color column
+  - Desktop action buttons: vertical sidebar (visible on hover)
+  - Touch-friendly: drag activation distance increased to 15px
+  - Responsive header: icon-only buttons on mobile, logo text hidden
+  - Favorites sidebar: bottom sheet on mobile (slides up), side drawer on desktop
+  - Visual drag handle on bottom sheet sidebar
+  - Regenerate button: viewport-width on mobile
+  - Modal padding and font sizes adjusted for small screens
+  - AiPalettePrompt textarea min-height reduced on mobile with spacing
+  - Scrollbar hidden on mobile (`scrollbar-width: none` + webkit)
+  - `useMediaQuery` hook: SSR-safe via `useSyncExternalStore`
+  - HEX input: `inputMode`, `autoCapitalize`, `autoCorrect` attributes for mobile KB
+  - Copy button: always visible on mobile with `opacity-80`
+  - Shades overlay: reduced padding on mobile, larger text
+  - Mobile header and regenerate controls are full-width, square, and participate in layout flow instead of overlapping content
+  - Header shadow removed and surface opacity increased to avoid color bleed/glow over bright palette columns
+  - Mobile Add Color action scrolls the palette list to the newly appended color
+  - Mobile color blocks grow to fill available screen height when there are only a few colors
+  - Mobile color shades strip expands directly under the selected color block, can be toggled closed, and opens shade detail bottom sheets
+  - Mobile shades strip label block removed so shade swatches use the full width
+  - Mobile shades strip supports horizontal touch scrolling with fixed-width swatches
+  - Mobile shades strip opens horizontally centered around the base color
+  - h-screen fallback for browsers without dvh support
 
 ## In Progress
 

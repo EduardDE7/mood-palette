@@ -92,14 +92,17 @@ export const SaveFavoriteColorModal = ({
             aria-describedby={descriptionId}
             tabIndex={-1}
             onClick={(event) => event.stopPropagation()}
-            className="glass-card w-[92vw] max-w-md rounded-3xl p-6 shadow-2xl"
+            className="glass-card w-[92vw] max-w-md rounded-3xl p-4 shadow-2xl sm:p-6"
           >
             <p id={descriptionId} className="sr-only">
               Choose where to save this color in favorites.
             </p>
 
             <div className="mb-5 flex items-center justify-between">
-              <h2 id={titleId} className="text-foreground text-xl font-bold">
+              <h2
+                id={titleId}
+                className="text-foreground text-lg font-bold sm:text-xl"
+              >
                 Save {colorHex}
               </h2>
               <Button
@@ -126,7 +129,7 @@ export const SaveFavoriteColorModal = ({
               id={selectId}
               value={selectedDestination}
               onChange={(event) => setSelectedDestination(event.target.value)}
-              className="bg-white/5 text-foreground border-border focus:border-accent/80 focus:ring-accent/60 mb-4 w-full rounded-xl border px-3 py-2 backdrop-blur-sm outline-none focus:ring-2"
+              className="text-foreground border-border focus:border-accent/80 focus:ring-accent/60 mb-4 w-full rounded-xl border bg-white/5 px-3 py-2 backdrop-blur-sm outline-none focus:ring-2"
             >
               <option value="default">Default palette</option>
               {palettes.map((palette) => (

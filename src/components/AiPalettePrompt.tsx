@@ -23,7 +23,7 @@ export const AiPalettePrompt = ({ onClose }: AiPalettePromptProps) => {
   const helperTextId = "ai-palette-helper";
 
   return (
-    <div className="relative w-[min(42rem,calc(100vw-1.5rem))]">
+    <div className="relative mb-2 w-[min(42rem,calc(100vw-1.5rem))] sm:mb-0">
       <div className="ai-glow relative rounded-[1.5rem]">
         <form
           className="border-border relative rounded-[1.5rem] border bg-[#1C221D]"
@@ -66,7 +66,7 @@ export const AiPalettePrompt = ({ onClose }: AiPalettePromptProps) => {
                 void generatePalette();
               }
             }}
-            className="text-foreground placeholder:text-muted-foreground block min-h-32 w-full resize-none border-0 bg-transparent px-4 pt-4 pr-16 pb-10 text-sm transition-colors outline-none disabled:opacity-60"
+            className="text-foreground placeholder:text-muted-foreground block min-h-24 w-full resize-none border-0 bg-transparent px-4 pt-4 pr-16 pb-10 text-sm transition-colors outline-none disabled:opacity-60 sm:min-h-32"
           />
 
           <Button

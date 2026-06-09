@@ -246,5 +246,26 @@ body {
       transparent 55%
     );
   background-attachment: fixed;
-  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@supports (-webkit-overflow-scrolling: touch) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media (max-width: 767px) {
+  * {
+    scrollbar-width: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 }

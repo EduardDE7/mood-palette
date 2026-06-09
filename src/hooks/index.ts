@@ -3,3 +3,4 @@ export * from "./useAccessibleModal";
 export * from "./usePaletteDnd";
 export * from "./useFavoritesDnd";
 export * from "./useAiPaletteGeneration";
+export * from "./useMediaQuery";

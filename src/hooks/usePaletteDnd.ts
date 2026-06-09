@@ -10,7 +10,7 @@ import {
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
-const DRAG_ACTIVATION_DISTANCE = 8;
+const DRAG_ACTIVATION_DISTANCE = 15;
 
 interface UsePaletteDndResult {
   activeId: string | null;

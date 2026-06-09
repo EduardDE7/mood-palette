@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { generateRandomHex, moveItemById, normalizeHex } from "@/utils";
+import { nanoid } from "nanoid";
 
 export interface ColorItem {
   id: string;
@@ -158,7 +159,7 @@ const createFavoritePaletteRecord = (
       : getNextPaletteName(existingPalettes);
 
   return {
-    id: crypto.randomUUID(),
+    id: nanoid(),
     name: paletteName,
     colors,
     createdAt: new Date().toISOString(),
@@ -231,7 +232,7 @@ export const usePaletteStore = create<PaletteState>()(
         const newColors = hexCodes
           .filter((hex) => /^[0-9A-F]{6}$/i.test(hex))
           .map((hex) => ({
-            id: crypto.randomUUID(),
+            id: nanoid(),
             hex: `#${hex.toUpperCase()}`,
             isLocked: false,
           }));
@@ -253,7 +254,7 @@ export const usePaletteStore = create<PaletteState>()(
 
         if (colors.length === 0) {
           newColors = Array.from({ length: 5 }).map(() => ({
-            id: crypto.randomUUID(),
+            id: nanoid(),
             hex: generateRandomHex(),
             isLocked: false,
           }));
@@ -372,7 +373,7 @@ export const usePaletteStore = create<PaletteState>()(
 
           const sourceColor = state.colors[index];
           const newColor = {
-            id: crypto.randomUUID(),
+            id: nanoid(),
             hex: sourceColor.hex,
             isLocked: sourceColor.isLocked,
           };
@@ -390,7 +391,7 @@ export const usePaletteStore = create<PaletteState>()(
           const newColors = [
             ...state.colors,
             {
-              id: crypto.randomUUID(),
+              id: nanoid(),
               hex: generateRandomHex(),
               isLocked: false,
             },
@@ -407,7 +408,9 @@ export const usePaletteStore = create<PaletteState>()(
 
           const highestLockedIndex = state.colors.reduce(
             (highestIndex, color, colorIndex) =>
-              color.isLocked ? Math.max(highestIndex, colorIndex) : highestIndex,
+              color.isLocked
+                ? Math.max(highestIndex, colorIndex)
+                : highestIndex,
             -1
           );
           const nextColorCount = Math.min(
@@ -423,7 +426,7 @@ export const usePaletteStore = create<PaletteState>()(
               }
 
               return {
-                id: currentColor?.id ?? crypto.randomUUID(),
+                id: currentColor?.id ?? nanoid(),
                 hex: normalizeHex(
                   hexes[colorIndex] ?? currentColor?.hex ?? generateRandomHex()
                 ),
@@ -671,7 +674,7 @@ export const usePaletteStore = create<PaletteState>()(
           }
 
           const nextColors = targetPalette.colors.map((hex) => ({
-            id: crypto.randomUUID(),
+            id: nanoid(),
             hex: normalizeHex(hex),
             isLocked: false,
           }));

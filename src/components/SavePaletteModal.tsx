@@ -87,7 +87,7 @@ export const SavePaletteModal = ({
             aria-describedby={descriptionId}
             tabIndex={-1}
             onClick={(event) => event.stopPropagation()}
-            className="glass-card max-h-[calc(100vh-2rem)] w-[92vw] max-w-md overflow-hidden rounded-3xl p-6 shadow-2xl"
+            className="glass-card max-h-[calc(100vh-2rem)] w-[92vw] max-w-md overflow-hidden rounded-3xl p-4 shadow-2xl sm:p-6"
           >
             <p id={descriptionId} className="sr-only">
               Name this palette and remove any colors before saving it to
@@ -95,7 +95,10 @@ export const SavePaletteModal = ({
             </p>
 
             <div className="mb-5 flex items-center justify-between gap-3">
-              <h2 id={titleId} className="text-foreground text-xl font-bold">
+              <h2
+                id={titleId}
+                className="text-foreground text-lg font-bold sm:text-xl"
+              >
                 Save Palette
               </h2>
               <Button

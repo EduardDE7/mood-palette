@@ -51,7 +51,7 @@ const CollapsedSwatch = ({
   return (
     <button
       onClick={handleCopy}
-      className="border-border relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-115 hover:shadow-md active:scale-95 group/swatch focus:outline-none focus:ring-1 focus:ring-ring"
+      className="border-border group/swatch focus:ring-ring relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-115 hover:shadow-md focus:ring-1 focus:outline-none active:scale-95"
       style={{ backgroundColor: hex }}
       title={`Click to copy: ${hex}`}
       aria-label={`Copy color ${hex}`}
@@ -191,16 +191,21 @@ export const FavoritesSidebar = ({
             />
 
             <motion.aside
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="glass-card fixed top-0 right-0 z-50 h-full w-[26rem] border-l shadow-2xl"
+              className="glass-card fixed inset-x-0 bottom-0 z-50 h-[90dvh] rounded-t-3xl border-t shadow-2xl sm:inset-x-auto sm:top-0 sm:right-0 sm:bottom-0 sm:h-full sm:w-[26rem] sm:rounded-t-none sm:border-t-0 sm:border-l"
             >
               <div className="flex h-full flex-col">
-                <div className="border-border border-b p-5">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-foreground text-xl font-bold drop-shadow-md">
+                {/* Drag handle for mobile, visible only below sm */}
+                <div className="flex items-center justify-center pt-3 sm:hidden">
+                  <div className="h-1.5 w-10 rounded-full bg-white/20" />
+                </div>
+
+                <div className="border-border border-b p-4 sm:p-5">
+                  <div className="mb-3 flex items-center justify-between sm:mb-4">
+                    <h2 className="text-foreground text-lg font-bold drop-shadow-md sm:text-xl">
                       Favorites Library
                     </h2>
                     <Button
@@ -272,24 +277,34 @@ export const FavoritesSidebar = ({
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                 >
-                  <div className="flex-1 space-y-6 overflow-y-auto p-5">
+                  <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-5">
                     <section>
                       <div className="mb-3 flex items-center justify-between gap-2">
                         <h3 className="text-foreground text-sm font-semibold tracking-wide uppercase">
                           Default Palette
                         </h3>
                         <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground text-xs mr-1">
+                          <span className="text-muted-foreground mr-1 text-xs">
                             {favorites.length} colors
                           </span>
                           <Button
                             variant="ghost"
                             size="icon"
                             round
-                            onClick={() => setIsDefaultExpanded(!isDefaultExpanded)}
+                            onClick={() =>
+                              setIsDefaultExpanded(!isDefaultExpanded)
+                            }
                             className="h-7 w-7"
-                            title={isDefaultExpanded ? "Collapse default palette" : "Expand default palette"}
-                            aria-label={isDefaultExpanded ? "Collapse default palette" : "Expand default palette"}
+                            title={
+                              isDefaultExpanded
+                                ? "Collapse default palette"
+                                : "Expand default palette"
+                            }
+                            aria-label={
+                              isDefaultExpanded
+                                ? "Collapse default palette"
+                                : "Expand default palette"
+                            }
                             aria-expanded={isDefaultExpanded}
                           >
                             {isDefaultExpanded ? (
@@ -393,7 +408,7 @@ export const FavoritesSidebar = ({
                                           cancelRenamePalette();
                                         }
                                       }}
-                                      className="bg-white/5 text-foreground border-border focus:border-accent/80 focus:ring-accent/60 w-full rounded-lg border px-2 py-1 text-sm backdrop-blur-sm outline-none focus:ring-2"
+                                      className="text-foreground border-border focus:border-accent/80 focus:ring-accent/60 w-full rounded-lg border bg-white/5 px-2 py-1 text-sm backdrop-blur-sm outline-none focus:ring-2"
                                       aria-label="Palette name"
                                     />
                                   ) : (

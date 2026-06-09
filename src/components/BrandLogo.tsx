@@ -9,7 +9,7 @@ export const BrandLogo = () => {
         role="img"
         aria-label="Palettrix"
         fill="none"
-        className="palettrix-logo -translate-y-px h-8 w-8 shrink-0 sm:h-9 sm:w-9"
+        className="palettrix-logo h-8 w-8 shrink-0 -translate-y-px md:h-9 md:w-9"
       >
         <defs>
           <linearGradient
@@ -105,13 +105,28 @@ export const BrandLogo = () => {
             strokeWidth="22"
           />
 
-          <circle cx="61" cy="82" r="15" fill="url(#palettrix-dot-gradient-1)" />
-          <circle cx="61" cy="127" r="15" fill="url(#palettrix-dot-gradient-2)" />
-          <circle cx="61" cy="172" r="15" fill="url(#palettrix-dot-gradient-3)" />
+          <circle
+            cx="61"
+            cy="82"
+            r="15"
+            fill="url(#palettrix-dot-gradient-1)"
+          />
+          <circle
+            cx="61"
+            cy="127"
+            r="15"
+            fill="url(#palettrix-dot-gradient-2)"
+          />
+          <circle
+            cx="61"
+            cy="172"
+            r="15"
+            fill="url(#palettrix-dot-gradient-3)"
+          />
         </g>
       </svg>
 
-      <h1 className="text-foreground text-xl font-bold tracking-tight drop-shadow-sm">
+      <h1 className="text-foreground hidden text-xl font-bold tracking-tight drop-shadow-sm md:block">
         Palettrix
       </h1>
     </div>

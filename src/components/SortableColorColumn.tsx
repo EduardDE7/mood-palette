@@ -3,18 +3,24 @@
 import { type CSSProperties, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ColorColumn } from "./ColorColumn";
+import { ColorColumn, MobileShadesStrip } from "@/components";
 
 interface SortableColorColumnProps {
   id: string;
   hex: string;
   isLocked: boolean;
+  isMobileShadesOpen?: boolean;
+  onCloseMobileShades?: () => void;
+  onOpenMobileShades?: (color: { hex: string; id: string }) => void;
 }
 
 export const SortableColorColumn = ({
   id,
   hex,
   isLocked,
+  isMobileShadesOpen = false,
+  onCloseMobileShades,
+  onOpenMobileShades,
 }: SortableColorColumnProps) => {
   const {
     attributes,
@@ -37,14 +43,26 @@ export const SortableColorColumn = ({
   );
 
   return (
-    <div ref={setNodeRef} style={style} className="group relative flex flex-1">
-      <ColorColumn
-        id={id}
-        hex={hex}
-        isLocked={isLocked}
-        dragAttributes={attributes}
-        dragListeners={listeners}
-        dragActivatorRef={setActivatorNodeRef}
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="group relative flex flex-1 max-md:flex-col"
+    >
+      <div className="flex flex-1 max-md:min-h-[7rem]">
+        <ColorColumn
+          id={id}
+          hex={hex}
+          isLocked={isLocked}
+          dragAttributes={attributes}
+          dragListeners={listeners}
+          dragActivatorRef={setActivatorNodeRef}
+          onOpenMobileShades={onOpenMobileShades}
+        />
+      </div>
+
+      <MobileShadesStrip
+        color={isMobileShadesOpen ? { hex, id, isLocked } : null}
+        onClose={onCloseMobileShades ?? (() => undefined)}
       />
     </div>
   );

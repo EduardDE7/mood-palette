@@ -51,13 +51,14 @@ Custom components built on Tailwind CSS. Base primitive: `Button` in `src/compon
 
 ## Layout Patterns
 
-- **Main page**: Full-viewport layout with header at top, color columns filling the center, and a floating regenerate bar at the bottom center
-- **Header**: Fixed top glass-pill bar with brand logo (left), action buttons (right)
+- **Main page**: Full-viewport layout with header at top, color columns filling the center, and a regenerate bar at the bottom
+- **Header**: Fixed top glass-pill bar on desktop; full-width, square, in-flow bar on mobile with brand logo (left), action buttons (right)
 - **Color columns**: Equal-width flex columns spanning full height, each with interactive overlays
+- **Mobile shades strip**: In-flow shades overview that expands directly under the selected mobile color block; each shade opens a bottom sheet with color values and an apply action
 - **Favorites sidebar**: Slide-in from right, fixed width glass-card panel
 - **Modals**: Portal-rendered centered overlays with backdrop blur, focus trapping via `useAccessibleModal`
 - **AI prompt**: Floating glass-card with animated glow border, positioned below the header
-- **Regenerate bar**: Bottom-center floating glass-pill with history arrows and action buttons
+- **Regenerate bar**: Bottom-center floating glass-pill on desktop; full-width, square, in-flow control bar on mobile
 
 ## Background Effects
 

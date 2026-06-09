@@ -81,7 +81,7 @@ export const ExportModal = ({
             aria-describedby={descriptionId}
             tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
-            className="glass-card max-h-[calc(100vh-2rem)] w-[90vw] max-w-2xl overflow-hidden rounded-3xl p-6 shadow-2xl"
+            className="glass-card max-h-[calc(100vh-2rem)] w-[90vw] max-w-2xl overflow-hidden rounded-3xl p-4 shadow-2xl sm:p-6"
           >
             <p id={descriptionId} className="sr-only">
               Choose export format and copy generated output. Press Escape to
@@ -89,7 +89,10 @@ export const ExportModal = ({
             </p>
 
             <div className="text-foreground mb-6 flex items-center justify-between drop-shadow-md">
-              <h2 id={titleId} className="text-2xl font-bold tracking-tight">
+              <h2
+                id={titleId}
+                className="text-lg font-bold tracking-tight sm:text-2xl"
+              >
                 {title}
               </h2>
               <Button

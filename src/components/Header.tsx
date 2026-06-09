@@ -4,11 +4,11 @@ import { BrandLogo, Button, ExportModal, SavePaletteModal } from "@/components";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
 interface HeaderProps {
+  onAddColor: () => void;
   onOpenFavorites: () => void;
 }
 
-export const Header = ({ onOpenFavorites }: HeaderProps) => {
-  const addColor = usePaletteStore((state) => state.addColor);
+export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
   const colors = usePaletteStore((state) => state.colors);
   const savePaletteToFavorites = usePaletteStore(
     (state) => state.savePaletteToFavorites
@@ -24,12 +24,12 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
   };
 
   return (
-    <header className="glass-card fixed top-6 left-1/2 z-50 flex h-14 w-[95%] max-w-5xl -translate-x-1/2 items-center rounded-full px-2 shadow-2xl sm:w-[90%] sm:px-3">
+    <header className="glass-card bg-card/90 relative z-50 flex h-12 w-full items-center rounded-none border-x-0 px-2 shadow-none md:fixed md:top-6 md:left-1/2 md:h-14 md:w-[90%] md:max-w-5xl md:-translate-x-1/2 md:rounded-full md:px-3">
       <div className="flex shrink-0 items-center">
         <BrandLogo />
       </div>
 
-      <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2 sm:gap-3">
+      <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-1 sm:gap-3">
         <Button
           variant="ghost"
           size="sm"
@@ -37,9 +37,10 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
           onClick={() => setIsSavePaletteOpen(true)}
           title="Save current palette to favorites"
           aria-label="Save current palette to favorites"
+          className="max-md:h-9 max-md:w-9 max-md:p-0"
         >
           <Save size={16} />
-          Save Palette
+          <span className="hidden md:inline">Save Palette</span>
         </Button>
 
         <Button
@@ -47,14 +48,21 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
           size="sm"
           round
           onClick={() => setIsExportOpen(true)}
+          className="max-md:h-9 max-md:w-9 max-md:p-0"
         >
           <Download size={18} />
-          Export
+          <span className="hidden md:inline">Export</span>
         </Button>
 
-        <Button variant="ghost" size="sm" round onClick={onOpenFavorites}>
+        <Button
+          variant="ghost"
+          size="sm"
+          round
+          onClick={onOpenFavorites}
+          className="max-md:h-9 max-md:w-9 max-md:p-0"
+        >
           <Heart size={18} />
-          Favorites
+          <span className="hidden md:inline">Favorites</span>
         </Button>
       </div>
 
@@ -63,12 +71,13 @@ export const Header = ({ onOpenFavorites }: HeaderProps) => {
           variant="white"
           size="sm"
           round
-          onClick={addColor}
+          onClick={onAddColor}
           title="Add a new color"
           aria-label="Add a new color"
+          className="max-md:h-9 max-md:w-9 max-md:p-0"
         >
           <Plus size={16} />
-          Add Color
+          <span className="hidden md:inline">Add Color</span>
         </Button>
       </div>
 
