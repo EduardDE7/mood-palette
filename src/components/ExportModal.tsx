@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, X } from "lucide-react";
@@ -22,27 +22,23 @@ export const ExportModal = ({
   title,
   colors,
 }: ExportModalProps) => {
-  const [isMounted, setIsMounted] = useState(false);
   const [format, setFormat] = useState<ExportFormat>("css");
   const [copied, setCopied] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const descriptionId = useId();
+  const portalContainer =
+    typeof document === "undefined" ? null : document.body;
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      setCopied(false);
-    }
-  }, [isOpen]);
+  const handleClose = useCallback(() => {
+    setCopied(false);
+    onClose();
+  }, [onClose]);
 
   useAccessibleModal({
     isOpen,
-    onClose,
+    onClose: handleClose,
     dialogRef,
     initialFocusRef: closeButtonRef,
   });
@@ -59,7 +55,7 @@ export const ExportModal = ({
     }
   };
 
-  if (!isMounted) {
+  if (!portalContainer) {
     return null;
   }
 
@@ -70,7 +66,7 @@ export const ExportModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onClick={handleClose}
           className="fixed inset-0 z-[60] grid place-items-center bg-black/20 p-4 backdrop-blur-sm"
         >
           <motion.div
@@ -100,7 +96,7 @@ export const ExportModal = ({
                 variant="ghost"
                 size="icon"
                 round
-                onClick={onClose}
+                onClick={handleClose}
                 title="Close export modal"
                 aria-label="Close export modal"
               >
@@ -162,6 +158,6 @@ export const ExportModal = ({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body
+    portalContainer
   );
 };

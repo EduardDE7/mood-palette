@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   type DragEndEvent,
   type DragStartEvent,
@@ -19,7 +19,7 @@ interface UsePaletteDndResult {
   sensors: ReturnType<typeof useSensors>;
 }
 
-export const usePaletteDnd = (colorIds: string[]): UsePaletteDndResult => {
+export const usePaletteDnd = (): UsePaletteDndResult => {
   const reorderColors = usePaletteStore((state) => state.reorderColors);
   const [activeId, setActiveId] = useState<string | null>(null);
 

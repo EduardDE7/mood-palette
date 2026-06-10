@@ -16,11 +16,17 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
 
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isSavePaletteOpen, setIsSavePaletteOpen] = useState(false);
+  const [savePaletteModalKey, setSavePaletteModalKey] = useState(0);
 
   const currentPaletteColors = colors.map((color) => color.hex);
 
   const handleSavePalette = (name: string, paletteColors: string[]) => {
     savePaletteToFavorites(name, paletteColors);
+  };
+
+  const openSavePaletteModal = () => {
+    setSavePaletteModalKey((currentKey) => currentKey + 1);
+    setIsSavePaletteOpen(true);
   };
 
   return (
@@ -34,7 +40,7 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
           variant="ghost"
           size="sm"
           round
-          onClick={() => setIsSavePaletteOpen(true)}
+          onClick={openSavePaletteModal}
           title="Save current palette to favorites"
           aria-label="Save current palette to favorites"
           className="max-md:h-9 max-md:w-9 max-md:p-0"
@@ -48,6 +54,8 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
           size="sm"
           round
           onClick={() => setIsExportOpen(true)}
+          title="Export current palette"
+          aria-label="Export current palette"
           className="max-md:h-9 max-md:w-9 max-md:p-0"
         >
           <Download size={18} />
@@ -59,6 +67,8 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
           size="sm"
           round
           onClick={onOpenFavorites}
+          title="Open favorites library"
+          aria-label="Open favorites library"
           className="max-md:h-9 max-md:w-9 max-md:p-0"
         >
           <Heart size={18} />
@@ -89,6 +99,7 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
       />
 
       <SavePaletteModal
+        key={savePaletteModalKey}
         isOpen={isSavePaletteOpen}
         onClose={() => setIsSavePaletteOpen(false)}
         onSave={handleSavePalette}

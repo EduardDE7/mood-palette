@@ -60,7 +60,8 @@ export const useAccessibleModal = ({
       }
 
       const firstFocusableElement = focusableElements[0];
-      const lastFocusableElement = focusableElements[focusableElements.length - 1];
+      const lastFocusableElement =
+        focusableElements[focusableElements.length - 1];
       const activeElement =
         document.activeElement instanceof HTMLElement
           ? document.activeElement

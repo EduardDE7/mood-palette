@@ -12,7 +12,7 @@
 | Icons      | Lucide React                     | Stroke-based icon set                       |
 | AI Backend | Groq API (openai/gpt-oss-120b)   | Natural language palette generation         |
 | Build      | Turbopack (dev) / Webpack (prod) | Fast dev HMR / production build             |
-| Linting    | ESLint 9 + Prettier              | Code quality and formatting                 |
+| Linting    | ESLint 9 CLI + Prettier          | Code quality and formatting                 |
 
 ## System Boundaries
 
@@ -29,7 +29,7 @@
 ## Storage Model
 
 - **localStorage**: Favorite colors and named favorite palettes (via Zustand `persist` middleware, key: `palette-favorites`)
-- **URL Hash**: Current palette state for sharing (e.g. `#FF0000-00FF00-0000FF`)
+- **URL Hash**: Current palette state for sharing (e.g. `#FF0000-00FF00-0000FF`). Hash payloads must contain 2–8 valid 6-digit HEX colors; invalid hashes are replaced by a generated palette.
 - **In-memory only**: Current palette colors, history, generation count, lock states
 
 ## External APIs
@@ -38,10 +38,10 @@
 
 ## Invariants
 
-1. Palette size is always between 2 and 8 colors — enforced in store actions and API validation
+1. Current palette size is always between 2 and 8 colors — enforced in store actions, URL hash restore, favorite palette application, and API validation
 2. HEX values are always normalized to uppercase `#RRGGBB` format via `normalizeHex()`
 3. Locked colors are never overwritten by random generation or AI generation
 4. Only `favorites` and `favoritePalettes` are persisted to localStorage — current palette and history are session-only
-5. URL hash always reflects the current palette state for shareability
+5. URL hash always reflects the current palette state for shareability, including the initial generated palette
 6. All interactive icon-only buttons must have `aria-label` and `title` attributes
 7. DnD operations validate payloads with type guards before executing mutations

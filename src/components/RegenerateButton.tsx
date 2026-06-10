@@ -48,24 +48,16 @@ export const RegenerateButton = ({
         ? formatColorCount(unlockedColorsCount)
         : "Unlock at least one color";
 
-  const rotateRefreshIcon = () => {
-    if (!canRegenerate) {
+  useEffect(() => {
+    if (generationCount === 0 || !canRegenerate) {
       return;
     }
 
-    refreshIconControls.start({
+    void refreshIconControls.start({
       rotate: [0, 180, 360],
       transition: { duration: 0.42, ease: "easeOut" },
     });
-  };
-
-  useEffect(() => {
-    if (generationCount === 0) {
-      return;
-    }
-
-    rotateRefreshIcon();
-  }, [generationCount]);
+  }, [canRegenerate, generationCount, refreshIconControls]);
 
   return (
     <div className="border-border/80 bg-card/80 relative z-30 flex w-full flex-col items-center gap-3 border-t px-2 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-2xl backdrop-blur-2xl md:absolute md:bottom-6 md:left-1/2 md:w-auto md:-translate-x-1/2 md:gap-4 md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none">

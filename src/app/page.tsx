@@ -39,8 +39,7 @@ export default function Home() {
   );
 
   const colorIds = useMemo(() => colors.map((color) => color.id), [colors]);
-  const { activeId, handleDragEnd, handleDragStart, sensors } =
-    usePaletteDnd(colorIds);
+  const { handleDragEnd, handleDragStart, sensors } = usePaletteDnd();
 
   const isMobile = useMediaQuery("(max-width: 767px)");
   const strategy = isMobile
@@ -108,7 +107,7 @@ export default function Home() {
   }, [addColor]);
 
   return (
-    <div className="relative flex h-screen min-h-screen h-dvh min-h-dvh flex-col overflow-hidden">
+    <div className="relative flex h-dvh h-screen min-h-dvh min-h-screen flex-col overflow-hidden">
       <Header
         onAddColor={handleAddColor}
         onOpenFavorites={() => setIsFavoritesOpen(true)}

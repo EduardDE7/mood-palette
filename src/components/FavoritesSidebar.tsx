@@ -100,12 +100,12 @@ export const FavoritesSidebar = ({
 
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isSavePaletteOpen, setIsSavePaletteOpen] = useState(false);
+  const [savePaletteModalKey, setSavePaletteModalKey] = useState(0);
   const [editingPaletteId, setEditingPaletteId] = useState<string | null>(null);
   const [paletteNameDraft, setPaletteNameDraft] = useState("");
   const [expandedPaletteIds, setExpandedPaletteIds] = useState<string[]>([]);
   const [isDefaultExpanded, setIsDefaultExpanded] = useState(false);
-  const { activeHex, handleDragEnd, handleDragStart, sensors } =
-    useFavoritesDnd();
+  const { handleDragEnd, handleDragStart, sensors } = useFavoritesDnd();
 
   const exportColors = useMemo(() => {
     const colorsFromPalettes = favoritePalettes.flatMap(
@@ -131,6 +131,11 @@ export const FavoritesSidebar = ({
     const createdPalette = createFavoritePalette();
     setEditingPaletteId(createdPalette.id);
     setPaletteNameDraft(createdPalette.name);
+  };
+
+  const openSavePaletteModal = () => {
+    setSavePaletteModalKey((currentKey) => currentKey + 1);
+    setIsSavePaletteOpen(true);
   };
 
   const handleSaveCurrentPalette = (name: string, paletteColors: string[]) => {
@@ -225,7 +230,7 @@ export const FavoritesSidebar = ({
                       variant="ghost"
                       size="sm"
                       round
-                      onClick={() => setIsSavePaletteOpen(true)}
+                      onClick={openSavePaletteModal}
                       title="Save current palette to favorites"
                       aria-label="Save current palette to favorites"
                     >
@@ -563,6 +568,7 @@ export const FavoritesSidebar = ({
       />
 
       <SavePaletteModal
+        key={savePaletteModalKey}
         isOpen={isSavePaletteOpen}
         onClose={() => setIsSavePaletteOpen(false)}
         onSave={handleSaveCurrentPalette}

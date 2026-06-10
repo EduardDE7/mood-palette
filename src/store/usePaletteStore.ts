@@ -63,6 +63,17 @@ interface PaletteState {
 }
 
 const DEFAULT_PALETTE_PREFIX = "Palette";
+const MIN_PALETTE_SIZE = 2;
+const MAX_PALETTE_SIZE = 8;
+const INITIAL_PALETTE_SIZE = 5;
+
+const isValidPaletteSize = (size: number) =>
+  size >= MIN_PALETTE_SIZE && size <= MAX_PALETTE_SIZE;
+
+const isValidPaletteHex = (hex: string) => /^#?[0-9A-F]{6}$/i.test(hex.trim());
+
+const normalizePaletteHexes = (hexes: string[]) =>
+  hexes.map((hex) => normalizeHex(hex)).filter(isValidPaletteHex);
 
 const cloneColors = (colors: ColorItem[]) =>
   colors.map((color) => ({ ...color }));
@@ -229,23 +240,27 @@ export const usePaletteStore = create<PaletteState>()(
         }
 
         const hexCodes = hash.split("-");
-        const newColors = hexCodes
-          .filter((hex) => /^[0-9A-F]{6}$/i.test(hex))
-          .map((hex) => ({
-            id: nanoid(),
-            hex: `#${hex.toUpperCase()}`,
-            isLocked: false,
-          }));
+        const isValidHashPalette =
+          isValidPaletteSize(hexCodes.length) &&
+          hexCodes.every(isValidPaletteHex);
 
-        if (newColors.length > 0) {
-          set({
-            colors: newColors,
-            paletteHistory: [cloneColors(newColors)],
-            paletteHistoryIndex: 0,
-          });
-        } else {
+        if (!isValidHashPalette) {
           get().generatePalette();
+          return;
         }
+
+        const newColors = hexCodes.map((hex) => ({
+          id: nanoid(),
+          hex: normalizeHex(hex),
+          isLocked: false,
+        }));
+
+        updateUrlHash(newColors);
+        set({
+          colors: newColors,
+          paletteHistory: [cloneColors(newColors)],
+          paletteHistoryIndex: 0,
+        });
       },
 
       generatePalette: () => {
@@ -253,7 +268,7 @@ export const usePaletteStore = create<PaletteState>()(
         let newColors: ColorItem[];
 
         if (colors.length === 0) {
-          newColors = Array.from({ length: 5 }).map(() => ({
+          newColors = Array.from({ length: INITIAL_PALETTE_SIZE }).map(() => ({
             id: nanoid(),
             hex: generateRandomHex(),
             isLocked: false,
@@ -266,6 +281,7 @@ export const usePaletteStore = create<PaletteState>()(
 
         set((state) => {
           if (state.colors.length === 0) {
+            updateUrlHash(newColors);
             return {
               colors: newColors,
               paletteHistory: [cloneColors(newColors)],
@@ -359,7 +375,7 @@ export const usePaletteStore = create<PaletteState>()(
 
       removeColor: (id: string) => {
         set((state) => {
-          if (state.colors.length <= 2) return state;
+          if (state.colors.length <= MIN_PALETTE_SIZE) return state;
           const newColors = state.colors.filter((c) => c.id !== id);
           return commitColors(state, newColors);
         });
@@ -367,7 +383,7 @@ export const usePaletteStore = create<PaletteState>()(
 
       duplicateColor: (id: string) => {
         set((state) => {
-          if (state.colors.length >= 8) return state;
+          if (state.colors.length >= MAX_PALETTE_SIZE) return state;
           const index = state.colors.findIndex((color) => color.id === id);
           if (index === -1) return state;
 
@@ -387,7 +403,7 @@ export const usePaletteStore = create<PaletteState>()(
 
       addColor: () => {
         set((state) => {
-          if (state.colors.length >= 8) return state;
+          if (state.colors.length >= MAX_PALETTE_SIZE) return state;
           const newColors = [
             ...state.colors,
             {
@@ -607,9 +623,9 @@ export const usePaletteStore = create<PaletteState>()(
       },
 
       savePaletteToFavorites: (name: string, colors: string[]) => {
-        const paletteColors = colors.map(normalizeHex);
+        const paletteColors = normalizePaletteHexes(colors);
 
-        if (paletteColors.length === 0) {
+        if (!isValidPaletteSize(paletteColors.length)) {
           return null;
         }
 
@@ -631,7 +647,7 @@ export const usePaletteStore = create<PaletteState>()(
           normalizeHex(color.hex)
         );
 
-        if (currentPaletteColors.length === 0) {
+        if (!isValidPaletteSize(currentPaletteColors.length)) {
           return null;
         }
 
@@ -669,7 +685,11 @@ export const usePaletteStore = create<PaletteState>()(
             (palette) => palette.id === paletteId
           );
 
-          if (!targetPalette || targetPalette.colors.length === 0) {
+          if (
+            !targetPalette ||
+            !isValidPaletteSize(targetPalette.colors.length) ||
+            !targetPalette.colors.every(isValidPaletteHex)
+          ) {
             return state;
           }
 

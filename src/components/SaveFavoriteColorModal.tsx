@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { FolderPlus, X } from "lucide-react";
@@ -29,27 +29,23 @@ export const SaveFavoriteColorModal = ({
   onSave,
   palettes,
 }: SaveFavoriteColorModalProps) => {
-  const [isMounted, setIsMounted] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState("default");
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const descriptionId = useId();
   const selectId = useId();
+  const portalContainer =
+    typeof document === "undefined" ? null : document.body;
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedDestination("default");
-    }
-  }, [isOpen]);
+  const handleClose = useCallback(() => {
+    setSelectedDestination("default");
+    onClose();
+  }, [onClose]);
 
   useAccessibleModal({
     isOpen,
-    onClose,
+    onClose: handleClose,
     dialogRef,
     initialFocusRef: closeButtonRef,
   });
@@ -62,15 +58,15 @@ export const SaveFavoriteColorModal = ({
   const handleSave = () => {
     if (selectedDestination === "default") {
       onSave({ type: "default" });
-      onClose();
+      handleClose();
       return;
     }
 
     onSave({ type: "palette", paletteId: selectedDestination });
-    onClose();
+    handleClose();
   };
 
-  if (!isMounted) {
+  if (!portalContainer) {
     return null;
   }
 
@@ -81,7 +77,7 @@ export const SaveFavoriteColorModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onClick={handleClose}
           className="fixed inset-0 z-[70] grid place-items-center bg-black/20 p-4 backdrop-blur-sm"
         >
           <motion.div
@@ -110,7 +106,7 @@ export const SaveFavoriteColorModal = ({
                 variant="ghost"
                 size="icon"
                 round
-                onClick={onClose}
+                onClick={handleClose}
                 title="Close save dialog"
                 aria-label="Close save dialog"
               >
@@ -158,7 +154,7 @@ export const SaveFavoriteColorModal = ({
                 variant="ghost"
                 size="sm"
                 round
-                onClick={onClose}
+                onClick={handleClose}
                 title="Cancel saving color"
                 aria-label="Cancel saving color"
               >
@@ -179,6 +175,6 @@ export const SaveFavoriteColorModal = ({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body
+    portalContainer
   );
 };

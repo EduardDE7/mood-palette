@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, X } from "lucide-react";
@@ -16,27 +16,36 @@ interface MobileShadesStripProps {
   onClose: () => void;
 }
 
-export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) => {
+interface SelectedShade {
+  colorId: string;
+  hex: string;
+}
+
+export const MobileShadesStrip = ({
+  color,
+  onClose,
+}: MobileShadesStripProps) => {
   const updateColor = usePaletteStore((s) => s.updateColor);
-  const [selectedShade, setSelectedShade] = useState<string | null>(null);
+  const [selectedShade, setSelectedShade] = useState<SelectedShade | null>(
+    null
+  );
   const [copiedValue, setCopiedValue] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
   const shadesScrollRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const descriptionId = useId();
   const shades = color ? generateShades(color.hex) : [];
-  const selectedShadeInfo = selectedShade ? getColorInfo(selectedShade) : null;
-  const isDetailsOpen = selectedShade !== null;
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setSelectedShade(null);
-  }, [color?.id]);
+  const selectedShadeHex =
+    selectedShade && selectedShade.colorId === color?.id
+      ? selectedShade.hex
+      : null;
+  const selectedShadeInfo = selectedShadeHex
+    ? getColorInfo(selectedShadeHex)
+    : null;
+  const isDetailsOpen = selectedShadeHex !== null;
+  const portalContainer =
+    typeof document === "undefined" ? null : document.body;
 
   useEffect(() => {
     if (!color) {
@@ -54,15 +63,14 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
     });
   }, [color?.id, color]);
 
-  useEffect(() => {
-    if (isDetailsOpen) {
-      setCopiedValue(null);
-    }
-  }, [isDetailsOpen, selectedShade]);
+  const closeShadeDetails = useCallback(() => {
+    setCopiedValue(null);
+    setSelectedShade(null);
+  }, []);
 
   useAccessibleModal({
     isOpen: isDetailsOpen,
-    onClose: () => setSelectedShade(null),
+    onClose: closeShadeDetails,
     dialogRef,
     initialFocusRef: closeButtonRef,
   });
@@ -78,12 +86,12 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
   };
 
   const applySelectedShade = () => {
-    if (!color || !selectedShade) {
+    if (!color || !selectedShadeHex) {
       return;
     }
 
-    updateColor(color.id, selectedShade);
-    setSelectedShade(null);
+    updateColor(color.id, selectedShadeHex);
+    closeShadeDetails();
     onClose();
   };
 
@@ -110,10 +118,13 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
                     <button
                       key={shade}
                       type="button"
-                      onClick={() => setSelectedShade(shade)}
+                      onClick={() => {
+                        setCopiedValue(null);
+                        setSelectedShade({ colorId: color.id, hex: shade });
+                      }}
                       title={`View shade ${shade}`}
                       aria-label={`View shade ${shade}`}
-                      className="focus-visible:ring-ring relative w-12 shrink-0 snap-start border-r border-black/10 outline-none transition-[filter,width] duration-150 last:border-r-0 hover:w-14 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset active:brightness-95"
+                      className="focus-visible:ring-ring relative w-12 shrink-0 snap-start border-r border-black/10 transition-[filter,width] duration-150 outline-none last:border-r-0 hover:w-14 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset active:brightness-95"
                       style={{ backgroundColor: shade }}
                     >
                       {isCurrent && (
@@ -131,15 +142,15 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
         )}
       </AnimatePresence>
 
-      {isMounted &&
+      {portalContainer &&
         createPortal(
           <AnimatePresence>
-            {color && selectedShade && selectedShadeInfo && (
+            {color && selectedShadeHex && selectedShadeInfo && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={() => setSelectedShade(null)}
+                onClick={closeShadeDetails}
                 className="fixed inset-0 z-[70] flex items-end bg-black/25 backdrop-blur-sm md:hidden"
               >
                 <motion.div
@@ -181,7 +192,7 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
                       variant="ghost"
                       size="icon"
                       round
-                      onClick={() => setSelectedShade(null)}
+                      onClick={closeShadeDetails}
                       title="Close shade details"
                       aria-label="Close shade details"
                     >
@@ -191,7 +202,7 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
 
                   <div
                     className="mb-4 h-24 w-full rounded-2xl border border-white/10"
-                    style={{ backgroundColor: selectedShade }}
+                    style={{ backgroundColor: selectedShadeHex }}
                     aria-hidden="true"
                   />
 
@@ -207,7 +218,7 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
                         onClick={() => copyValue(value)}
                         title={`Copy ${label} value`}
                         aria-label={`Copy ${label} value ${value}`}
-                        className="border-border/80 bg-muted/30 text-foreground flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left backdrop-blur-xl transition-colors hover:bg-muted/40 focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none"
+                        className="border-border/80 bg-muted/30 text-foreground hover:bg-muted/40 focus-visible:ring-ring flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left backdrop-blur-xl transition-colors focus-visible:ring-2 focus-visible:outline-none"
                       >
                         <span className="text-muted-foreground text-xs font-bold tracking-wide">
                           {label}
@@ -231,7 +242,7 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
                     className="w-full"
                     onClick={applySelectedShade}
                     title="Apply shade to color"
-                    aria-label={`Apply shade ${selectedShade} to color ${color.hex}`}
+                    aria-label={`Apply shade ${selectedShadeHex} to color ${color.hex}`}
                   >
                     Apply Shade
                   </Button>
@@ -239,7 +250,7 @@ export const MobileShadesStrip = ({ color, onClose }: MobileShadesStripProps) =>
               </motion.div>
             )}
           </AnimatePresence>,
-          document.body
+          portalContainer
         )}
     </>
   );

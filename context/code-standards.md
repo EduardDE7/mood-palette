@@ -28,6 +28,8 @@
 - Use targeted selectors: `const colors = usePaletteStore(s => s.colors)` — never destructure the whole store
 - Use `persist` middleware only for data that should survive page reloads (favorites)
 - Keep store actions pure and focused — complex derived state in selectors or hooks
+- Any action that creates or applies the current editor palette must enforce the 2–8 color invariant before updating `colors`
+- URL hash restore and favorite palette application are system boundaries and must reject invalid HEX values or unsupported palette sizes
 
 ## Styling
 
@@ -51,6 +53,11 @@
 - Return consistent response shapes (e.g. `{ colors: string[] }`)
 - Use type guards for all external input validation
 - Server-side only — no client-side direct API calls to external services
+
+## Tooling
+
+- `npm run lint` must run ESLint directly (`eslint .`) with the Next.js flat config exports; do not use the removed `next lint` command
+- Run `npm run build`, `npm run lint`, and `npx prettier --check .` before delivering implementation changes
 
 ## File Organization
 

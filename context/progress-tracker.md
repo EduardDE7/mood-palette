@@ -21,6 +21,11 @@ Update this file after every meaningful implementation change.
 - Shareable URLs via hash routing
 - Glass-morphism dark UI with animations
 - Accessibility (keyboard shortcuts, focus trapping, aria attributes)
+- Maintenance fixes:
+  - Current palette size invariant hardened across URL hash restore, initial generation, favorite save, and favorite palette application
+  - Initial random palette now writes a shareable URL hash immediately
+  - Header mobile icon buttons now include explicit `title` and `aria-label`
+  - Lint pipeline updated for Next.js 16 via ESLint CLI and flat config exports
 - Custom Button component with 9 variants
 - Brand logo with animated gradient SVG
 - Modals: ExportModal, SavePaletteModal, SaveFavoriteColorModal
@@ -80,3 +85,4 @@ Update this file after every meaningful implementation change.
 - Context files (`context/`) have been adapted to the actual Palettrix project as of June 2026
 - Placeholder directories exist for future auth and database features: `src/lib/auth/`, `src/app/api/auth/`, `db/migrations/`
 - `.env` contains `GROQ_API_KEY` — required for AI palette generation
+- June 2026 maintenance pass fixed palette invariant regressions, restored lint execution, and documented guardrails in `architecture.md` and `code-standards.md`

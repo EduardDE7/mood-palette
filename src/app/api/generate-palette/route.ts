@@ -199,7 +199,7 @@ export async function POST(request: Request) {
           {
             role: "system",
             content:
-              "You are a senior brand and product color designer. Create expressive, production-usable color palettes from short visual descriptions in any language. Translate the scene into atmosphere, lighting, material, temperature, depth, and accent colors instead of choosing literal object colors only. Prefer sophisticated harmony: one anchor color, supporting colors, a useful neutral or atmospheric color when appropriate, and one memorable accent when the palette needs it. Avoid generic rainbow palettes, muddy low-contrast sets, duplicated colors, pure black, pure white, and colors that differ only slightly. Preserve locked colors exactly at their provided indices and design the remaining colors around them. Return valid JSON only, with this exact shape: {\"colors\":[\"#RRGGBB\"]}.",
+              'You are a senior brand and product color designer. Create expressive, production-usable color palettes from short visual descriptions in any language. Translate the scene into atmosphere, lighting, material, temperature, depth, and accent colors instead of choosing literal object colors only. Prefer sophisticated harmony: one anchor color, supporting colors, a useful neutral or atmospheric color when appropriate, and one memorable accent when the palette needs it. Avoid generic rainbow palettes, muddy low-contrast sets, duplicated colors, pure black, pure white, and colors that differ only slightly. Preserve locked colors exactly at their provided indices and design the remaining colors around them. Return valid JSON only, with this exact shape: {"colors":["#RRGGBB"]}.',
           },
           {
             role: "user",

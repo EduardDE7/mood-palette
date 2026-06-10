@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Save, Trash2, X } from "lucide-react";
@@ -21,7 +21,6 @@ export const SavePaletteModal = ({
   onClose,
   onSave,
 }: SavePaletteModalProps) => {
-  const [isMounted, setIsMounted] = useState(false);
   const [paletteName, setPaletteName] = useState("");
   const [selectedColors, setSelectedColors] = useState<string[]>(colors);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -29,23 +28,19 @@ export const SavePaletteModal = ({
   const titleId = useId();
   const descriptionId = useId();
   const nameInputId = useId();
+  const canSaveSelectedPalette = selectedColors.length >= 2;
+  const portalContainer =
+    typeof document === "undefined" ? null : document.body;
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
+  const handleClose = useCallback(() => {
     setPaletteName("");
     setSelectedColors(colors);
-  }, [colors, isOpen]);
+    onClose();
+  }, [colors, onClose]);
 
   useAccessibleModal({
     isOpen,
-    onClose,
+    onClose: handleClose,
     dialogRef,
     initialFocusRef: nameInputRef,
   });
@@ -57,15 +52,15 @@ export const SavePaletteModal = ({
   };
 
   const handleSave = () => {
-    if (selectedColors.length === 0) {
+    if (!canSaveSelectedPalette) {
       return;
     }
 
     onSave(paletteName, selectedColors);
-    onClose();
+    handleClose();
   };
 
-  if (!isMounted) {
+  if (!portalContainer) {
     return null;
   }
 
@@ -76,7 +71,7 @@ export const SavePaletteModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onClick={handleClose}
           className="fixed inset-0 z-[70] grid place-items-center bg-black/20 p-4 backdrop-blur-sm"
         >
           <motion.div
@@ -105,7 +100,7 @@ export const SavePaletteModal = ({
                 variant="ghost"
                 size="icon"
                 round
-                onClick={onClose}
+                onClick={handleClose}
                 title="Close save palette dialog"
                 aria-label="Close save palette dialog"
               >
@@ -163,7 +158,7 @@ export const SavePaletteModal = ({
                 variant="ghost"
                 size="sm"
                 round
-                onClick={onClose}
+                onClick={handleClose}
                 title="Cancel saving palette"
                 aria-label="Cancel saving palette"
               >
@@ -174,8 +169,12 @@ export const SavePaletteModal = ({
                 size="sm"
                 round
                 onClick={handleSave}
-                disabled={selectedColors.length === 0}
-                title="Save palette to favorites"
+                disabled={!canSaveSelectedPalette}
+                title={
+                  canSaveSelectedPalette
+                    ? "Save palette to favorites"
+                    : "Select at least 2 colors to save a palette"
+                }
                 aria-label="Save palette to favorites"
               >
                 <Save size={16} />
@@ -186,6 +185,6 @@ export const SavePaletteModal = ({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body
+    portalContainer
   );
 };
