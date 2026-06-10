@@ -13,6 +13,7 @@ Update this file after every meaningful implementation change.
 ## Completed
 
 - Core palette editor (generate, lock, edit, reorder, undo/redo)
+- Palette history panel for visually restoring one of the latest 20 snapshots
 - Color shades viewer (21 shades per color)
 - Favorites system with named palettes (localStorage persistence)
 - Favorites DnD between palettes
@@ -86,3 +87,4 @@ Update this file after every meaningful implementation change.
 - Placeholder directories exist for future auth and database features: `src/lib/auth/`, `src/app/api/auth/`, `db/migrations/`
 - `.env` contains `GROQ_API_KEY` — required for AI palette generation
 - June 2026 maintenance pass fixed palette invariant regressions, restored lint execution, and documented guardrails in `architecture.md` and `code-standards.md`
+- Added visual palette history timeline for restoring recent snapshots from the regenerate controls

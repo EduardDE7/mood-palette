@@ -9,6 +9,7 @@ export * from "./FavoriteDropContainer";
 export * from "./FavoritesSidebar";
 export * from "./ExportModal";
 export * from "./RegenerateButton";
+export * from "./PaletteHistoryPanel";
 export * from "./AiPalettePrompt";
 export * from "./MobileShadesStrip";
 export * from "./ui";

@@ -34,6 +34,7 @@ interface PaletteState {
   canGoForwardInPaletteHistory: () => boolean;
   goBackInPaletteHistory: () => void;
   goForwardInPaletteHistory: () => void;
+  goToPaletteHistoryIndex: (index: number) => void;
   reorderColors: (activeId: string, overId: string) => void;
   toggleLock: (id: string) => void;
   updateColor: (id: string, hex: string) => void;
@@ -66,6 +67,7 @@ const DEFAULT_PALETTE_PREFIX = "Palette";
 const MIN_PALETTE_SIZE = 2;
 const MAX_PALETTE_SIZE = 8;
 const INITIAL_PALETTE_SIZE = 5;
+const PALETTE_HISTORY_LIMIT = 20;
 
 const isValidPaletteSize = (size: number) =>
   size >= MIN_PALETTE_SIZE && size <= MAX_PALETTE_SIZE;
@@ -116,7 +118,9 @@ const commitColors = (
     0,
     state.paletteHistoryIndex + 1
   );
-  const nextHistory = [...truncatedHistory, cloneColors(newColors)];
+  const nextHistory = [...truncatedHistory, cloneColors(newColors)].slice(
+    -PALETTE_HISTORY_LIMIT
+  );
 
   updateUrlHash(newColors);
 
@@ -338,6 +342,26 @@ export const usePaletteStore = create<PaletteState>()(
           return {
             colors: nextColors,
             paletteHistoryIndex: nextIndex,
+          };
+        });
+      },
+
+      goToPaletteHistoryIndex: (index: number) => {
+        set((state) => {
+          if (
+            index === state.paletteHistoryIndex ||
+            index < 0 ||
+            index >= state.paletteHistory.length
+          ) {
+            return state;
+          }
+
+          const nextColors = cloneColors(state.paletteHistory[index]);
+          updateUrlHash(nextColors);
+
+          return {
+            colors: nextColors,
+            paletteHistoryIndex: index,
           };
         });
       },

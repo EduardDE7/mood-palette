@@ -29,6 +29,7 @@ export default function Home() {
   const generationCount = usePaletteStore((s) => s.generationCount);
   const generatePalette = usePaletteStore((s) => s.generatePalette);
   const syncWithUrl = usePaletteStore((s) => s.syncWithUrl);
+  const paletteHistory = usePaletteStore((s) => s.paletteHistory);
   const paletteHistoryIndex = usePaletteStore((s) => s.paletteHistoryIndex);
   const paletteHistoryLength = usePaletteStore((s) => s.paletteHistory.length);
   const goBackInPaletteHistory = usePaletteStore(
@@ -36,6 +37,9 @@ export default function Home() {
   );
   const goForwardInPaletteHistory = usePaletteStore(
     (s) => s.goForwardInPaletteHistory
+  );
+  const goToPaletteHistoryIndex = usePaletteStore(
+    (s) => s.goToPaletteHistoryIndex
   );
 
   const colorIds = useMemo(() => colors.map((color) => color.id), [colors]);
@@ -160,6 +164,8 @@ export default function Home() {
       <RegenerateButton
         colors={colors}
         generationCount={generationCount}
+        history={paletteHistory}
+        historyIndex={paletteHistoryIndex}
         canGoBack={paletteHistoryIndex > 0}
         canGoForward={
           paletteHistoryIndex >= 0 &&
@@ -167,6 +173,7 @@ export default function Home() {
         }
         onBack={goBackInPaletteHistory}
         onForward={goForwardInPaletteHistory}
+        onHistorySelect={goToPaletteHistoryIndex}
         onRegenerate={generatePalette}
       />
 

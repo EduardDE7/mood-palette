@@ -30,7 +30,7 @@
 
 - **localStorage**: Favorite colors and named favorite palettes (via Zustand `persist` middleware, key: `palette-favorites`)
 - **URL Hash**: Current palette state for sharing (e.g. `#FF0000-00FF00-0000FF`). Hash payloads must contain 2–8 valid 6-digit HEX colors; invalid hashes are replaced by a generated palette.
-- **In-memory only**: Current palette colors, history, generation count, lock states
+- **In-memory only**: Current palette colors, latest 20 palette history snapshots, generation count, lock states
 
 ## External APIs
 
@@ -45,3 +45,4 @@
 5. URL hash always reflects the current palette state for shareability, including the initial generated palette
 6. All interactive icon-only buttons must have `aria-label` and `title` attributes
 7. DnD operations validate payloads with type guards before executing mutations
+8. Palette history is capped to the latest 20 snapshots and restores snapshots by index without persisting them to localStorage

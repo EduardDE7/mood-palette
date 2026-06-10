@@ -30,6 +30,7 @@ Palettrix is a single-page color palette generator and editor for designers and 
 - Random palette generation (2–8 colors)
 - Color locking (preserves locked colors during regeneration)
 - Undo/redo history (Ctrl+Z / Ctrl+Shift+Z)
+- Visual palette history panel for restoring one of the latest 20 snapshots
 - Drag-and-drop color reordering
 - Inline HEX editing (click to edit, right-click to copy)
 - Color shades viewer (21 shades per color: tints + base + darks)

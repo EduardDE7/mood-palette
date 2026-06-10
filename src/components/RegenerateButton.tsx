@@ -2,20 +2,31 @@
 
 import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
-import { ArrowLeft, ArrowRight, Lock, RefreshCw, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  History,
+  Lock,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
 
 import { Button } from "@/components/ui";
 import type { ColorItem } from "@/store/usePaletteStore";
 
 import { AiPalettePrompt } from "./AiPalettePrompt";
+import { PaletteHistoryPanel } from "./PaletteHistoryPanel";
 
 interface RegenerateButtonProps {
   canGoBack: boolean;
   canGoForward: boolean;
   colors: ColorItem[];
   generationCount: number;
+  history: ColorItem[][];
+  historyIndex: number;
   onBack: () => void;
   onForward: () => void;
+  onHistorySelect: (index: number) => void;
   onRegenerate: () => void;
 }
 
@@ -27,15 +38,20 @@ export const RegenerateButton = ({
   canGoForward,
   colors,
   generationCount,
+  history,
+  historyIndex,
   onBack,
   onForward,
+  onHistorySelect,
   onRegenerate,
 }: RegenerateButtonProps) => {
   const helperTextId = useId();
   const refreshIconControls = useAnimationControls();
   const [isAiPromptOpen, setIsAiPromptOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const unlockedColorsCount = colors.filter((color) => !color.isLocked).length;
   const canRegenerate = colors.length === 0 || unlockedColorsCount > 0;
+  const canOpenHistory = history.length > 1;
 
   const title = canRegenerate
     ? "Press Space to regenerate palette"
@@ -59,8 +75,41 @@ export const RegenerateButton = ({
     });
   }, [canRegenerate, generationCount, refreshIconControls]);
 
+  const toggleHistory = () => {
+    setIsAiPromptOpen(false);
+    setIsHistoryOpen((isOpen) => !isOpen);
+  };
+
+  const toggleAiPrompt = () => {
+    setIsHistoryOpen(false);
+    setIsAiPromptOpen((isOpen) => !isOpen);
+  };
+
+  const handleHistorySelect = (index: number) => {
+    onHistorySelect(index);
+    setIsHistoryOpen(false);
+  };
+
   return (
     <div className="border-border/80 bg-card/80 relative z-30 flex w-full flex-col items-center gap-3 border-t px-2 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-2xl backdrop-blur-2xl md:absolute md:bottom-6 md:left-1/2 md:w-auto md:-translate-x-1/2 md:gap-4 md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none">
+      <AnimatePresence>
+        {isHistoryOpen && (
+          <motion.div
+            key="palette-history-panel"
+            initial={{ opacity: 0, y: 18, scale: 0.96, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: 14, scale: 0.97, filter: "blur(8px)" }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          >
+            <PaletteHistoryPanel
+              currentIndex={historyIndex}
+              history={history}
+              onSelect={handleHistorySelect}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {isAiPromptOpen && (
           <motion.div
@@ -76,7 +125,25 @@ export const RegenerateButton = ({
       </AnimatePresence>
 
       <div className="flex w-full items-center justify-center gap-2 md:w-auto md:gap-3">
-        <div className="flex h-12 w-auto items-center justify-end gap-1 md:w-[5.5rem] md:gap-2">
+        <div className="flex h-12 w-auto items-center justify-end gap-1 md:w-[8.25rem] md:gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            round
+            onClick={toggleHistory}
+            disabled={!canOpenHistory}
+            title={
+              canOpenHistory
+                ? "Open palette history"
+                : "Palette history appears after changes"
+            }
+            aria-label="Open palette history"
+            aria-expanded={isHistoryOpen}
+            className="glass-card bg-card/80 hover:bg-card/90 h-10 w-10 shadow-2xl disabled:cursor-not-allowed"
+          >
+            <History size={18} />
+          </Button>
+
           <AnimatePresence>
             {canGoBack && (
               <motion.div
@@ -171,7 +238,7 @@ export const RegenerateButton = ({
           variant="ghost"
           size="icon"
           round
-          onClick={() => setIsAiPromptOpen((isOpen) => !isOpen)}
+          onClick={toggleAiPrompt}
           title={
             isAiPromptOpen
               ? "Close AI palette prompt"
