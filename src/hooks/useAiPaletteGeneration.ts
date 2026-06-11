@@ -1,16 +1,23 @@
 import { useState } from "react";
 
 import { usePaletteStore } from "@/store/usePaletteStore";
-import { normalizeHex } from "@/utils";
+import { normalizeHex, type PaletteRole } from "@/utils";
 
 interface AiPaletteLockedColor {
   index: number;
   hex: string;
 }
 
+interface AiPaletteCurrentColor extends AiPaletteLockedColor {
+  isLocked: boolean;
+  role: string | null;
+}
+
 interface GeneratePaletteResponse {
   colors: string[];
 }
+
+type AiPaletteMode = "generate" | "refine";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -38,10 +45,28 @@ const buildLockedColors = (colors: { hex: string; isLocked: boolean }[]) =>
     return lockedColors;
   }, []);
 
+const buildCurrentColors = (
+  colors: { hex: string; isLocked: boolean; role: string | null }[],
+  roles: PaletteRole[]
+) =>
+  colors.map<AiPaletteCurrentColor>((color, index) => {
+    const role = color.role
+      ? roles.find((roleDefinition) => roleDefinition.key === color.role)
+      : null;
+
+    return {
+      index,
+      hex: normalizeHex(color.hex),
+      isLocked: color.isLocked,
+      role: role?.label ?? null,
+    };
+  });
+
 export const useAiPaletteGeneration = () => {
   const applyGeneratedPalette = usePaletteStore(
     (state) => state.applyGeneratedPalette
   );
+  const currentColorCount = usePaletteStore((state) => state.colors.length);
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,16 +79,25 @@ export const useAiPaletteGeneration = () => {
     }
   };
 
-  const generatePalette = async () => {
-    const description = prompt.trim();
+  const requestPalette = async (description: string, mode: AiPaletteMode) => {
+    const { colors, paletteRoles } = usePaletteStore.getState();
+    const lockedColors = buildLockedColors(colors);
+    const currentColors =
+      mode === "refine" ? buildCurrentColors(colors, paletteRoles) : undefined;
 
     if (!description) {
-      setError("Enter a short palette description.");
+      setError(
+        mode === "refine"
+          ? "Enter a short refinement command."
+          : "Enter a short palette description."
+      );
       return;
     }
 
-    const { colors } = usePaletteStore.getState();
-    const lockedColors = buildLockedColors(colors);
+    if (mode === "refine" && (colors.length < 2 || colors.length > 8)) {
+      setError("Create a palette before refining it.");
+      return;
+    }
 
     setIsGenerating(true);
     setError(null);
@@ -76,7 +110,9 @@ export const useAiPaletteGeneration = () => {
         },
         body: JSON.stringify({
           description,
+          mode,
           currentPaletteSize: colors.length,
+          currentColors,
           lockedColors,
         }),
       });
@@ -118,11 +154,21 @@ export const useAiPaletteGeneration = () => {
     }
   };
 
+  const generatePalette = async () => {
+    await requestPalette(prompt.trim(), "generate");
+  };
+
+  const refinePalette = async (instruction = prompt.trim()) => {
+    await requestPalette(instruction.trim(), "refine");
+  };
+
   return {
+    canRefine: currentColorCount >= 2,
     error,
     generatePalette,
     isGenerating,
     prompt,
+    refinePalette,
     setPrompt: updatePrompt,
   };
 };

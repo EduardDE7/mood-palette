@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ArrowUp, LoaderCircle, X } from "lucide-react";
+import { ArrowUp, LoaderCircle, WandSparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui";
 import { useAiPaletteGeneration } from "@/hooks";
@@ -10,9 +10,27 @@ interface AiPalettePromptProps {
   onClose: () => void;
 }
 
+const REFINEMENT_COMMANDS = [
+  { label: "Warmer", instruction: "make it warmer" },
+  { label: "More contrast", instruction: "increase contrast" },
+  { label: "Premium", instruction: "more premium" },
+  { label: "Less saturated", instruction: "less saturated" },
+  {
+    label: "Primary blue",
+    instruction: "make primary blue but keep mood",
+  },
+] as const;
+
 export const AiPalettePrompt = ({ onClose }: AiPalettePromptProps) => {
-  const { error, generatePalette, isGenerating, prompt, setPrompt } =
-    useAiPaletteGeneration();
+  const {
+    canRefine,
+    error,
+    generatePalette,
+    isGenerating,
+    prompt,
+    refinePalette,
+    setPrompt,
+  } = useAiPaletteGeneration();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -66,8 +84,49 @@ export const AiPalettePrompt = ({ onClose }: AiPalettePromptProps) => {
                 void generatePalette();
               }
             }}
-            className="text-foreground placeholder:text-muted-foreground block min-h-24 w-full resize-none border-0 bg-transparent px-4 pt-4 pr-16 pb-10 text-sm transition-colors outline-none disabled:opacity-60 sm:min-h-32"
+            className="text-foreground placeholder:text-muted-foreground block min-h-24 w-full resize-none border-0 bg-transparent px-4 pt-4 pr-16 pb-4 text-sm transition-colors outline-none disabled:opacity-60 sm:min-h-32"
           />
+
+          <div className="px-3 pb-14">
+            <p className="sr-only">Refine the current palette with AI</p>
+            <div className="flex flex-wrap gap-1.5">
+              {REFINEMENT_COMMANDS.map((command) => (
+                <button
+                  key={command.instruction}
+                  type="button"
+                  onClick={() => void refinePalette(command.instruction)}
+                  disabled={isGenerating || !canRefine}
+                  title={
+                    canRefine
+                      ? `Refine current palette: ${command.instruction}`
+                      : "Create a palette before refining it"
+                  }
+                  className="border-border text-muted-foreground hover:bg-muted/40 hover:text-foreground rounded-full border bg-black/10 px-2.5 py-1 text-[11px] font-bold transition disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  {command.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            round
+            disabled={isGenerating || !canRefine || prompt.trim().length === 0}
+            onClick={() => void refinePalette()}
+            title="Refine the current palette with this instruction"
+            aria-label="Refine current palette with this instruction"
+            className="absolute bottom-3 left-3 h-9"
+          >
+            {isGenerating ? (
+              <LoaderCircle size={14} className="animate-spin" />
+            ) : (
+              <WandSparkles size={14} />
+            )}
+            <span>Refine</span>
+          </Button>
 
           <Button
             type="submit"
