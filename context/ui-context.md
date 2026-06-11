@@ -54,10 +54,17 @@ Custom components built on Tailwind CSS. Base primitive: `Button` in `src/compon
 - **Main page**: Full-viewport layout with header at top, color columns filling the center, and a regenerate bar at the bottom
 - **Header**: Fixed top glass-pill bar on desktop; full-width, square, in-flow bar on mobile with brand logo (left), action buttons (right)
 - **Color columns**: Equal-width flex columns spanning full height, each with interactive overlays
+- **Manual role selector**: Compact uppercase selector above each HEX label; defaults to "No role" and lets the user assign one semantic role per color
+- **Role manager modal**: Portal modal opened from color columns for creating, renaming, and deleting roles
+- **Contrast checker panel**: Compact WCAG panel for assigned foreground/background, primary/background, and accent/background role pairs; appears bottom-left on desktop and in-flow above regenerate controls on mobile
+- **Harmony tools panel**: Compact panel for selecting a base swatch and applying complementary, analogous, triadic, monochrome, or split complementary harmony; appears bottom-right on desktop and in-flow above regenerate controls on mobile
+- **Palette quality indicator**: Quiet desktop header pill with a 0–100 score and a popover breakdown for contrast, hue balance, saturation spread, duplicate similarity, and muddy/neon warnings
+- **Live preview panel**: Mini product UI preview with sidebar, card, input, buttons, status chip, chart, and normal/deuteranopia/protanopia/tritanopia simulation controls; appears top-left on desktop and in-flow above analysis controls on mobile
 - **Mobile shades strip**: In-flow shades overview that expands directly under the selected mobile color block; each shade opens a bottom sheet with color values and an apply action
 - **Favorites sidebar**: Slide-in from right, fixed width glass-card panel
 - **Modals**: Portal-rendered centered overlays with backdrop blur, focus trapping via `useAccessibleModal`
-- **AI prompt**: Floating glass-card with animated glow border, positioned below the header
+- **Export modal**: Wrapped format selector supporting CSS, Tailwind config, JSON, `tokens.json`, Tailwind v4, and shadcn theme outputs
+- **AI prompt**: Floating glass-card with animated glow border, positioned below the header; supports generation from text plus compact refinement command chips for the current palette
 - **Regenerate bar**: Bottom-center floating glass-pill on desktop; full-width, square, in-flow control bar on mobile
 
 ## Background Effects

@@ -13,12 +13,20 @@ Update this file after every meaningful implementation change.
 ## Completed
 
 - Core palette editor (generate, lock, edit, reorder, undo/redo)
+- Manual semantic palette roles for background, foreground, muted, primary, accent, and danger
+- Role manager for creating, renaming, and deleting roles
+- WCAG contrast checker for key assigned role pairs
+- Harmony tools for generating complementary, analogous, triadic, monochrome, and split complementary palettes
+- Palette quality scoring with contrast, hue balance, saturation spread, duplicate similarity, and muddy/neon checks
+- Live UI preview with sidebar, card, input, buttons, status chip, and chart
+- Color blindness simulation for deuteranopia, protanopia, and tritanopia in live preview
 - Palette history panel for visually restoring one of the latest 20 snapshots
 - Color shades viewer (21 shades per color)
 - Favorites system with named palettes (localStorage persistence)
 - Favorites DnD between palettes
 - AI palette generation via Groq API
-- Export to CSS, Tailwind, and JSON formats
+- AI refinement commands for the current palette via Groq API
+- Export to CSS, Tailwind, JSON, Style Dictionary tokens, Tailwind v4 theme variables, and shadcn-compatible theme formats
 - Shareable URLs via hash routing
 - Glass-morphism dark UI with animations
 - Accessibility (keyboard shortcuts, focus trapping, aria attributes)
@@ -88,3 +96,12 @@ Update this file after every meaningful implementation change.
 - `.env` contains `GROQ_API_KEY` — required for AI palette generation
 - June 2026 maintenance pass fixed palette invariant regressions, restored lint execution, and documented guardrails in `architecture.md` and `code-standards.md`
 - Added visual palette history timeline for restoring recent snapshots from the regenerate controls
+- Added manual semantic role assignment per color, defaulting new/restored colors to no role, with semantic current-palette exports for assigned roles only
+- Added persisted user-manageable role definitions with inline create, rename, and delete flows
+- Added WCAG contrast checker for foreground/background, primary/background, and accent/background role pairs
+- Added harmony tools panel with base swatch selection and five harmony modes that respect locked colors
+- Added quiet palette quality indicator with scoring breakdown and warnings
+- Added live UI preview panel derived from semantic roles with current-palette fallbacks
+- Added design-token export formats: Style Dictionary `tokens.json`, Tailwind v4 `@theme`, and shadcn-compatible theme block
+- Added preview-only color blindness simulation modes for deuteranopia, protanopia, and tritanopia
+- Added AI refinement for the current palette with quick commands for warmer, higher contrast, more premium, less saturated, and primary-blue adjustments

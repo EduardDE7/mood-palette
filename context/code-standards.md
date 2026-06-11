@@ -30,6 +30,19 @@
 - Keep store actions pure and focused — complex derived state in selectors or hooks
 - Any action that creates or applies the current editor palette must enforce the 2–8 color invariant before updating `colors`
 - URL hash restore and favorite palette application are system boundaries and must reject invalid HEX values or unsupported palette sizes
+- Semantic role data is user-assigned on `ColorItem.role`, not derived from palette position. New colors, URL hash restores, duplicates, and favorite-applied palettes must default to `role: null`.
+- Role assignment must keep role keys unique within the current palette so semantic exports cannot produce duplicate token names.
+- Palette role definitions live in `paletteRoles`, are persisted to localStorage, and must keep normalized labels unique.
+- Deleting a role must clear matching `ColorItem.role` values from the current palette and palette history snapshots.
+- Export formatting must deduplicate generated token names because custom role labels can collide with numbered fallback names.
+- All palette export formats must be implemented in `src/utils/export.ts` and reuse the same token-entry generation path so CSS, JSON, Style Dictionary, Tailwind, and shadcn outputs stay aligned.
+- WCAG contrast calculations must use relative luminance and contrast ratio utilities from `src/utils/colors.ts`; do not reuse the YIQ `getContrastColor()` helper for accessibility scoring.
+- Color harmony generation must use pure utilities in `src/utils/colors.ts` and apply through store actions so locks, roles, URL hash, and palette history stay consistent.
+- Palette quality scoring must remain a pure derived calculation in `src/utils/colors.ts`; do not persist score state or make components own scoring formulas.
+- Live preview components must derive UI tokens from current colors and semantic roles at render time; do not persist preview-specific token state.
+- Color blindness simulation must use pure utilities from `src/utils/colors.ts` and remain preview-only; never mutate current palette colors or export simulated colors unless explicitly requested.
+- AI refinement must call the server-side palette generation route with the current palette context, preserve palette size, preserve locked colors, and apply results through the store rather than mutating component state.
+- Update `src/utils/roles.ts` whenever default roles or role token-name normalization changes.
 
 ## Styling
 

@@ -13,7 +13,7 @@ Palettrix is a single-page color palette generator and editor for designers and 
 
 ## Core User Flow
 
-1. Open the app — a random 5-color palette is displayed
+1. Open the app — a random 6-color palette is displayed with no roles assigned
 2. Press Space to regenerate unlocked colors
 3. Click HEX labels to manually edit values
 4. Lock colors to preserve them across regenerations
@@ -28,6 +28,13 @@ Palettrix is a single-page color palette generator and editor for designers and 
 ### Palette Generation
 
 - Random palette generation (2–8 colors)
+- Manual semantic role assignment per color
+- Create, rename, and delete palette roles
+- WCAG contrast checker for foreground/background, primary/background, and accent/background role pairs
+- Harmony tools: complementary, analogous, triadic, monochrome, and split complementary palettes built around a selected base color
+- Palette quality scoring for contrast, hue balance, saturation spread, duplicate similarity, and muddy/neon outliers
+- Live UI preview with buttons, card, input, sidebar, and chart surfaces derived from semantic roles
+- Color blindness simulation in live preview for deuteranopia, protanopia, and tritanopia
 - Color locking (preserves locked colors during regeneration)
 - Undo/redo history (Ctrl+Z / Ctrl+Shift+Z)
 - Visual palette history panel for restoring one of the latest 20 snapshots
@@ -39,6 +46,7 @@ Palettrix is a single-page color palette generator and editor for designers and 
 ### AI Palette Generation
 
 - Natural language prompts (supports any language)
+- AI refinement commands for the current palette: warmer, higher contrast, more premium, less saturated, and primary-blue adjustments
 - Powered by Groq API (openai/gpt-oss-120b model)
 - Respects locked colors during generation
 - Animated glowing border effect on the prompt input
@@ -57,6 +65,10 @@ Palettrix is a single-page color palette generator and editor for designers and 
 - CSS custom properties format
 - Tailwind config format
 - JSON format
+- Style Dictionary `tokens.json` format
+- Tailwind v4 `@theme` variables format
+- shadcn-compatible CSS theme block
+- Current palette export uses manually assigned semantic role names when available and numbered names for unassigned colors
 - Copy to clipboard
 - Export all favorites or current palette
 
@@ -67,6 +79,7 @@ Palettrix is a single-page color palette generator and editor for designers and 
 
 ### Accessibility
 
+- WCAG contrast ratios for key UI role pairs
 - Full keyboard support (Space, Ctrl+Z, Escape, arrow keys for DnD)
 - `aria-label` and `title` on all interactive elements
 - Semantic HTML structure
