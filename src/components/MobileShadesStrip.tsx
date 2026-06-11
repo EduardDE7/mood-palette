@@ -11,8 +11,10 @@ import type { ColorItem } from "@/store/usePaletteStore";
 import { usePaletteStore } from "@/store/usePaletteStore";
 import { generateShades, getColorInfo, getContrastColor } from "@/utils";
 
+type MobileShadeColor = Pick<ColorItem, "hex" | "id" | "isLocked">;
+
 interface MobileShadesStripProps {
-  color: ColorItem | null;
+  color: MobileShadeColor | null;
   onClose: () => void;
 }
 

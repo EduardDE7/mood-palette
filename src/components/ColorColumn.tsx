@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { type ChangeEvent, useState, useEffect } from "react";
 import {
   Copy,
   GripVertical,
   Heart,
   Lock,
   Palette,
+  Pencil,
   Trash2,
   Unlock,
 } from "lucide-react";
@@ -19,8 +20,14 @@ import {
   type FavoriteLocation,
   usePaletteStore,
 } from "@/store/usePaletteStore";
-import { Button, SaveFavoriteColorModal } from "@/components";
+import { Button, RoleManagerModal, SaveFavoriteColorModal } from "@/components";
 import { generateShades, getContrastColor } from "@/utils/colors";
+import {
+  getPaletteRoleByKey,
+  isPaletteRoleKey,
+  NO_PALETTE_ROLE_VALUE,
+  type PaletteRoleKey,
+} from "@/utils";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -67,6 +74,7 @@ interface ColorColumnProps {
   dragListeners?: DraggableSyntheticListeners;
   dragActivatorRef?: (node: HTMLElement | null) => void;
   onOpenMobileShades?: (color: { hex: string; id: string }) => void;
+  role: PaletteRoleKey | null;
 }
 
 export const ColorColumn = ({
@@ -77,11 +85,13 @@ export const ColorColumn = ({
   dragListeners,
   dragActivatorRef,
   onOpenMobileShades,
+  role,
 }: ColorColumnProps) => {
   const toggleLock = usePaletteStore((s) => s.toggleLock);
   const removeColor = usePaletteStore((s) => s.removeColor);
   const duplicateColor = usePaletteStore((s) => s.duplicateColor);
   const updateColor = usePaletteStore((s) => s.updateColor);
+  const updateColorRole = usePaletteStore((s) => s.updateColorRole);
   const colorsCount = usePaletteStore((s) => s.colors.length);
   const favorites = usePaletteStore((s) => s.favorites);
   const favoritePalettes = usePaletteStore((s) => s.favoritePalettes);
@@ -96,7 +106,9 @@ export const ColorColumn = ({
   const [showShades, setShowShades] = useState(false);
   const [editValue, setEditValue] = useState(hex);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isRoleManagerOpen, setIsRoleManagerOpen] = useState(false);
   const contrastColor = getContrastColor(hex);
+  const paletteRoles = usePaletteStore((s) => s.paletteRoles);
 
   useEffect(() => {
     if (!showShades) return;
@@ -116,6 +128,8 @@ export const ColorColumn = ({
   );
   const isFavorite = isFavoriteInDefault || isFavoriteInPalettes;
   const canDelete = colorsCount > 2;
+  const selectedRoleLabel =
+    getPaletteRoleByKey(role, paletteRoles)?.label ?? "No role";
 
   const toggleFavorite = () => {
     if (isFavorite) {
@@ -177,6 +191,62 @@ export const ColorColumn = ({
 
     setShowShades(!showShades);
   };
+
+  const handleRoleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const nextValue = event.target.value;
+    updateColorRole(
+      id,
+      isPaletteRoleKey(nextValue, paletteRoles) ? nextValue : null
+    );
+  };
+
+  const renderRoleSelect = (inputId: string) => (
+    <div className="flex items-center gap-1">
+      <label className="sr-only" htmlFor={inputId}>
+        Assign color role
+      </label>
+      <select
+        id={inputId}
+        value={role ?? NO_PALETTE_ROLE_VALUE}
+        onChange={handleRoleChange}
+        aria-label={`Assign role for ${hex}`}
+        title={`Current role: ${selectedRoleLabel}`}
+        className="max-w-36 rounded-full border border-current/25 bg-black/10 px-2.5 py-1 text-center text-[10px] font-bold tracking-wide uppercase opacity-75 backdrop-blur-sm transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current"
+        style={{ color: contrastColor }}
+      >
+        <option
+          className="bg-card text-foreground"
+          value={NO_PALETTE_ROLE_VALUE}
+        >
+          No role
+        </option>
+        {paletteRoles.map((paletteRole) => (
+          <option
+            key={paletteRole.key}
+            className="bg-card text-foreground"
+            value={paletteRole.key}
+          >
+            {paletteRole.label}
+          </option>
+        ))}
+      </select>
+      <Button
+        variant="ghost"
+        size="icon"
+        round
+        onClick={(event) => {
+          event.stopPropagation();
+          setIsRoleManagerOpen(true);
+        }}
+        style={{ color: contrastColor }}
+        title="Manage palette roles"
+        aria-label="Manage palette roles"
+        className="h-7 w-7 opacity-75 transition-opacity hover:opacity-100"
+      >
+        <Pencil size={12} />
+      </Button>
+    </div>
+  );
 
   return (
     <div
@@ -294,7 +364,9 @@ export const ColorColumn = ({
           )}
         </div>
 
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center gap-2">
+          {renderRoleSelect(`color-role-${id}-desktop`)}
+
           {isEditing ? (
             <input
               autoFocus
@@ -358,7 +430,9 @@ export const ColorColumn = ({
 
       {/* Mobile: centered HEX with copy, locked indicator */}
       <div className="z-10 flex hidden flex-col items-center gap-3 max-md:flex">
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center gap-2">
+          {renderRoleSelect(`color-role-${id}-mobile`)}
+
           {isEditing ? (
             <input
               autoFocus
@@ -579,6 +653,11 @@ export const ColorColumn = ({
         palettes={favoritePalettes}
         onCreatePalette={createFavoritePalette}
         onSave={handleSaveToDestination}
+      />
+
+      <RoleManagerModal
+        isOpen={isRoleManagerOpen}
+        onClose={() => setIsRoleManagerOpen(false)}
       />
     </div>
   );

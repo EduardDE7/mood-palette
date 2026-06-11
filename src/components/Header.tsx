@@ -10,6 +10,7 @@ interface HeaderProps {
 
 export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
   const colors = usePaletteStore((state) => state.colors);
+  const paletteRoles = usePaletteStore((state) => state.paletteRoles);
   const savePaletteToFavorites = usePaletteStore(
     (state) => state.savePaletteToFavorites
   );
@@ -19,6 +20,7 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
   const [savePaletteModalKey, setSavePaletteModalKey] = useState(0);
 
   const currentPaletteColors = colors.map((color) => color.hex);
+  const currentPaletteRoles = colors.map((color) => color.role);
 
   const handleSavePalette = (name: string, paletteColors: string[]) => {
     savePaletteToFavorites(name, paletteColors);
@@ -96,6 +98,9 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
         onClose={() => setIsExportOpen(false)}
         title="Export Palette"
         colors={currentPaletteColors}
+        roleDefinitions={paletteRoles}
+        roles={currentPaletteRoles}
+        semanticNames
       />
 
       <SavePaletteModal

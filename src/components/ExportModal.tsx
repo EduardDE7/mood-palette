@@ -7,20 +7,40 @@ import { Check, Copy, X } from "lucide-react";
 
 import { Button } from "@/components";
 import { useAccessibleModal } from "@/hooks";
-import { formatColorsForExport, type ExportFormat } from "@/utils";
+import {
+  formatColorsForExport,
+  type ExportFormat,
+  type PaletteRole,
+  type PaletteRoleKey,
+} from "@/utils";
 
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   colors: string[];
+  roleDefinitions?: readonly PaletteRole[];
+  roles?: Array<PaletteRoleKey | null | undefined>;
+  semanticNames?: boolean;
 }
+
+const EXPORT_FORMAT_OPTIONS: Array<{ format: ExportFormat; label: string }> = [
+  { format: "css", label: "CSS" },
+  { format: "tailwind", label: "Tailwind" },
+  { format: "json", label: "JSON" },
+  { format: "tokens", label: "tokens.json" },
+  { format: "tailwind-v4", label: "Tailwind v4" },
+  { format: "shadcn", label: "shadcn" },
+];
 
 export const ExportModal = ({
   isOpen,
   onClose,
   title,
   colors,
+  roleDefinitions,
+  roles,
+  semanticNames = false,
 }: ExportModalProps) => {
   const [format, setFormat] = useState<ExportFormat>("css");
   const [copied, setCopied] = useState(false);
@@ -43,7 +63,11 @@ export const ExportModal = ({
     initialFocusRef: closeButtonRef,
   });
 
-  const formattedOutput = formatColorsForExport(colors, format, "color");
+  const formattedOutput = formatColorsForExport(colors, format, "color", {
+    roleDefinitions,
+    roles,
+    semanticNames,
+  });
 
   const handleCopy = async () => {
     try {
@@ -77,7 +101,7 @@ export const ExportModal = ({
             aria-describedby={descriptionId}
             tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
-            className="glass-card max-h-[calc(100vh-2rem)] w-[90vw] max-w-2xl overflow-hidden rounded-3xl p-4 shadow-2xl sm:p-6"
+            className="glass-card max-h-[calc(100vh-2rem)] w-[90vw] max-w-3xl overflow-hidden rounded-3xl p-4 shadow-2xl sm:p-6"
           >
             <p id={descriptionId} className="sr-only">
               Choose export format and copy generated output. Press Escape to
@@ -105,23 +129,22 @@ export const ExportModal = ({
             </div>
 
             <div
-              className="mb-4 flex gap-2"
+              className="mb-4 flex flex-wrap gap-2"
               role="group"
               aria-label="Export format"
             >
-              {(["css", "tailwind", "json"] as ExportFormat[]).map((f) => (
+              {EXPORT_FORMAT_OPTIONS.map(({ format: f, label }) => (
                 <Button
                   key={f}
                   variant={format === f ? "white" : "ghost"}
                   size="sm"
                   round
                   onClick={() => setFormat(f)}
-                  className="capitalize"
                   aria-pressed={format === f}
-                  title={`Use ${f} format`}
-                  aria-label={`Use ${f} format`}
+                  title={`Use ${label} format`}
+                  aria-label={`Use ${label} format`}
                 >
-                  {f}
+                  {label}
                 </Button>
               ))}
             </div>

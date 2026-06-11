@@ -1,12 +1,24 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { generateRandomHex, moveItemById, normalizeHex } from "@/utils";
+import {
+  DEFAULT_PALETTE_ROLES,
+  generateRandomHex,
+  getHarmonyColor,
+  isPaletteRoleKey,
+  moveItemById,
+  normalizePaletteRoleLabel,
+  normalizeHex,
+  type ColorHarmonyMode,
+  type PaletteRole,
+  type PaletteRoleKey,
+} from "@/utils";
 import { nanoid } from "nanoid";
 
 export interface ColorItem {
   id: string;
   hex: string;
   isLocked: boolean;
+  role: PaletteRoleKey | null;
 }
 
 export interface FavoritePalette {
@@ -27,6 +39,7 @@ interface PaletteState {
   generationCount: number;
   paletteHistory: PaletteHistorySnapshot[];
   paletteHistoryIndex: number;
+  paletteRoles: PaletteRole[];
   favorites: string[];
   favoritePalettes: FavoritePalette[];
   generatePalette: () => void;
@@ -38,6 +51,11 @@ interface PaletteState {
   reorderColors: (activeId: string, overId: string) => void;
   toggleLock: (id: string) => void;
   updateColor: (id: string, hex: string) => void;
+  updateColorRole: (id: string, role: PaletteRoleKey | null) => void;
+  applyColorHarmony: (baseColorId: string, mode: ColorHarmonyMode) => void;
+  createPaletteRole: (label: string) => PaletteRole | null;
+  renamePaletteRole: (roleKey: PaletteRoleKey, label: string) => void;
+  deletePaletteRole: (roleKey: PaletteRoleKey) => void;
   removeColor: (id: string) => void;
   duplicateColor: (id: string) => void;
   addColor: () => void;
@@ -66,8 +84,9 @@ interface PaletteState {
 const DEFAULT_PALETTE_PREFIX = "Palette";
 const MIN_PALETTE_SIZE = 2;
 const MAX_PALETTE_SIZE = 8;
-const INITIAL_PALETTE_SIZE = 5;
+const INITIAL_PALETTE_SIZE = 6;
 const PALETTE_HISTORY_LIMIT = 20;
+const MAX_ROLE_LABEL_LENGTH = 28;
 
 const isValidPaletteSize = (size: number) =>
   size >= MIN_PALETTE_SIZE && size <= MAX_PALETTE_SIZE;
@@ -79,6 +98,38 @@ const normalizePaletteHexes = (hexes: string[]) =>
 
 const cloneColors = (colors: ColorItem[]) =>
   colors.map((color) => ({ ...color }));
+
+const clonePaletteRoles = (roles: readonly PaletteRole[]) =>
+  roles.map((role) => ({ ...role }));
+
+const clearRoleFromColors = (colors: ColorItem[], roleKey: PaletteRoleKey) =>
+  colors.map((color) =>
+    color.role === roleKey ? { ...color, role: null } : color
+  );
+
+const getUniquePaletteRoleKey = (roles: PaletteRole[]) => {
+  let nextIndex = roles.length + 1;
+  let nextKey = `role-${nextIndex}`;
+
+  while (roles.some((role) => role.key === nextKey)) {
+    nextIndex += 1;
+    nextKey = `role-${nextIndex}`;
+  }
+
+  return nextKey;
+};
+
+const isDuplicateRoleLabel = (
+  roles: PaletteRole[],
+  label: string,
+  ignoredRoleKey?: PaletteRoleKey
+) =>
+  roles.some(
+    (role) =>
+      role.key !== ignoredRoleKey &&
+      normalizePaletteRoleLabel(role.label).toLocaleLowerCase() ===
+        label.toLocaleLowerCase()
+  );
 
 const areColorSnapshotsEqual = (
   firstColors: ColorItem[],
@@ -93,7 +144,8 @@ const areColorSnapshotsEqual = (
     return (
       color.id === otherColor.id &&
       color.hex === otherColor.hex &&
-      color.isLocked === otherColor.isLocked
+      color.isLocked === otherColor.isLocked &&
+      color.role === otherColor.role
     );
   });
 };
@@ -232,6 +284,7 @@ export const usePaletteStore = create<PaletteState>()(
       generationCount: 0,
       paletteHistory: [],
       paletteHistoryIndex: -1,
+      paletteRoles: clonePaletteRoles(DEFAULT_PALETTE_ROLES),
       favorites: [],
       favoritePalettes: [],
 
@@ -257,6 +310,7 @@ export const usePaletteStore = create<PaletteState>()(
           id: nanoid(),
           hex: normalizeHex(hex),
           isLocked: false,
+          role: null,
         }));
 
         updateUrlHash(newColors);
@@ -276,6 +330,7 @@ export const usePaletteStore = create<PaletteState>()(
             id: nanoid(),
             hex: generateRandomHex(),
             isLocked: false,
+            role: null,
           }));
         } else {
           newColors = colors.map((color) =>
@@ -397,6 +452,130 @@ export const usePaletteStore = create<PaletteState>()(
         });
       },
 
+      updateColorRole: (id: string, role: PaletteRoleKey | null) => {
+        set((state) => {
+          const nextRole =
+            role && isPaletteRoleKey(role, state.paletteRoles) ? role : null;
+          const newColors = state.colors.map((color) => {
+            if (color.id === id) {
+              return { ...color, role: nextRole };
+            }
+
+            if (nextRole && color.role === nextRole) {
+              return { ...color, role: null };
+            }
+
+            return color;
+          });
+
+          return commitColors(state, newColors);
+        });
+      },
+
+      applyColorHarmony: (baseColorId: string, mode: ColorHarmonyMode) => {
+        set((state) => {
+          const anchorIndex = state.colors.findIndex(
+            (color) => color.id === baseColorId
+          );
+
+          if (anchorIndex === -1) {
+            return state;
+          }
+
+          const baseHex = state.colors[anchorIndex].hex;
+          const newColors = state.colors.map((color, colorIndex) => {
+            if (color.isLocked) {
+              return color;
+            }
+
+            return {
+              ...color,
+              hex: getHarmonyColor(baseHex, mode, colorIndex, anchorIndex),
+            };
+          });
+
+          return commitColors(state, newColors, {
+            generationCount: state.generationCount + 1,
+          });
+        });
+      },
+
+      createPaletteRole: (label: string) => {
+        const normalizedLabel = normalizePaletteRoleLabel(label).slice(
+          0,
+          MAX_ROLE_LABEL_LENGTH
+        );
+
+        if (!normalizedLabel) {
+          return null;
+        }
+
+        const existingRole = get().paletteRoles.find(
+          (role) =>
+            normalizePaletteRoleLabel(role.label).toLocaleLowerCase() ===
+            normalizedLabel.toLocaleLowerCase()
+        );
+
+        if (existingRole) {
+          return existingRole;
+        }
+
+        const createdRole = {
+          key: getUniquePaletteRoleKey(get().paletteRoles),
+          label: normalizedLabel,
+        };
+
+        set((state) => ({
+          paletteRoles: [...state.paletteRoles, createdRole],
+        }));
+
+        return createdRole;
+      },
+
+      renamePaletteRole: (roleKey: PaletteRoleKey, label: string) => {
+        const normalizedLabel = normalizePaletteRoleLabel(label).slice(
+          0,
+          MAX_ROLE_LABEL_LENGTH
+        );
+
+        if (!normalizedLabel) {
+          return;
+        }
+
+        set((state) => {
+          if (
+            !state.paletteRoles.some((role) => role.key === roleKey) ||
+            isDuplicateRoleLabel(state.paletteRoles, normalizedLabel, roleKey)
+          ) {
+            return state;
+          }
+
+          return {
+            paletteRoles: state.paletteRoles.map((role) =>
+              role.key === roleKey ? { ...role, label: normalizedLabel } : role
+            ),
+          };
+        });
+      },
+
+      deletePaletteRole: (roleKey: PaletteRoleKey) => {
+        set((state) => {
+          if (!state.paletteRoles.some((role) => role.key === roleKey)) {
+            return state;
+          }
+
+          return {
+            paletteRoles: state.paletteRoles.filter(
+              (role) => role.key !== roleKey
+            ),
+            colors: clearRoleFromColors(state.colors, roleKey),
+            paletteHistory: state.paletteHistory.map((snapshot) =>
+              clearRoleFromColors(snapshot, roleKey)
+            ),
+          };
+        });
+      },
+
       removeColor: (id: string) => {
         set((state) => {
           if (state.colors.length <= MIN_PALETTE_SIZE) return state;
@@ -416,6 +595,7 @@ export const usePaletteStore = create<PaletteState>()(
             id: nanoid(),
             hex: sourceColor.hex,
             isLocked: sourceColor.isLocked,
+            role: null,
           };
 
           const newColors = [...state.colors];
@@ -434,6 +614,7 @@ export const usePaletteStore = create<PaletteState>()(
               id: nanoid(),
               hex: generateRandomHex(),
               isLocked: false,
+              role: null,
             },
           ];
           return commitColors(state, newColors);
@@ -471,6 +652,7 @@ export const usePaletteStore = create<PaletteState>()(
                   hexes[colorIndex] ?? currentColor?.hex ?? generateRandomHex()
                 ),
                 isLocked: false,
+                role: currentColor?.role ?? null,
               };
             }
           );
@@ -721,6 +903,7 @@ export const usePaletteStore = create<PaletteState>()(
             id: nanoid(),
             hex: normalizeHex(hex),
             isLocked: false,
+            role: null,
           }));
 
           return commitColors(state, nextColors);
@@ -814,6 +997,7 @@ export const usePaletteStore = create<PaletteState>()(
       partialize: (state) => ({
         favorites: state.favorites,
         favoritePalettes: state.favoritePalettes,
+        paletteRoles: state.paletteRoles,
       }),
     }
   )

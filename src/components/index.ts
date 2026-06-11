@@ -12,4 +12,5 @@ export * from "./RegenerateButton";
 export * from "./PaletteHistoryPanel";
 export * from "./AiPalettePrompt";
 export * from "./MobileShadesStrip";
+export * from "./RoleManagerModal";
 export * from "./ui";
