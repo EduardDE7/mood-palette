@@ -1,6 +1,9 @@
 export * from "./Header";
 export * from "./BrandLogo";
 export * from "./ColorColumn";
+export * from "./ContrastCheckerPanel";
+export * from "./HarmonyToolsPanel";
+export * from "./LivePreviewPanel";
 export * from "./SortableColorColumn";
 export * from "./SaveFavoriteColorModal";
 export * from "./SavePaletteModal";
@@ -10,6 +13,7 @@ export * from "./FavoritesSidebar";
 export * from "./ExportModal";
 export * from "./RegenerateButton";
 export * from "./PaletteHistoryPanel";
+export * from "./PaletteQualityIndicator";
 export * from "./AiPalettePrompt";
 export * from "./MobileShadesStrip";
 export * from "./RoleManagerModal";

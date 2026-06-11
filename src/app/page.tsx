@@ -13,7 +13,10 @@ import { usePaletteStore } from "@/store/usePaletteStore";
 import {
   Header,
   SortableColorColumn,
+  ContrastCheckerPanel,
   FavoritesSidebar,
+  HarmonyToolsPanel,
+  LivePreviewPanel,
   RegenerateButton,
 } from "@/components";
 import { useKeyboardShortcuts, useMediaQuery, usePaletteDnd } from "@/hooks";
@@ -25,9 +28,11 @@ const STAGGER_TRANSITION = {
 
 export default function Home() {
   const colors = usePaletteStore((s) => s.colors);
+  const paletteRoles = usePaletteStore((s) => s.paletteRoles);
   const addColor = usePaletteStore((s) => s.addColor);
   const generationCount = usePaletteStore((s) => s.generationCount);
   const generatePalette = usePaletteStore((s) => s.generatePalette);
+  const applyColorHarmony = usePaletteStore((s) => s.applyColorHarmony);
   const syncWithUrl = usePaletteStore((s) => s.syncWithUrl);
   const paletteHistory = usePaletteStore((s) => s.paletteHistory);
   const paletteHistoryIndex = usePaletteStore((s) => s.paletteHistoryIndex);
@@ -160,6 +165,10 @@ export default function Home() {
           </SortableContext>
         </DndContext>
       </motion.main>
+
+      <LivePreviewPanel colors={colors} roles={paletteRoles} />
+      <ContrastCheckerPanel colors={colors} roles={paletteRoles} />
+      <HarmonyToolsPanel colors={colors} onApplyHarmony={applyColorHarmony} />
 
       <RegenerateButton
         colors={colors}

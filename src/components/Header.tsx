@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Plus, Heart, Download, Save } from "lucide-react";
-import { BrandLogo, Button, ExportModal, SavePaletteModal } from "@/components";
+import {
+  BrandLogo,
+  Button,
+  ExportModal,
+  PaletteQualityIndicator,
+  SavePaletteModal,
+} from "@/components";
 import { usePaletteStore } from "@/store/usePaletteStore";
 
 interface HeaderProps {
@@ -33,8 +39,9 @@ export const Header = ({ onAddColor, onOpenFavorites }: HeaderProps) => {
 
   return (
     <header className="glass-card bg-card/90 relative z-50 flex h-12 w-full items-center rounded-none border-x-0 px-2 shadow-none md:fixed md:top-6 md:left-1/2 md:h-14 md:w-[90%] md:max-w-5xl md:-translate-x-1/2 md:rounded-full md:px-3">
-      <div className="flex shrink-0 items-center">
+      <div className="flex shrink-0 items-center gap-2">
         <BrandLogo />
+        <PaletteQualityIndicator colors={colors} />
       </div>
 
       <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-1 sm:gap-3">
